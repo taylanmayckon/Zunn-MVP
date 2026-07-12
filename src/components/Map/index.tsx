@@ -39,15 +39,17 @@ export default function Map({
         injectedJavaScript={`
           
           window.stations =
-            ${JSON.stringify(stations)};
+          ${JSON.stringify(stations)};
 
-            window.scooters =
-            ${JSON.stringify(
-              scooters.filter(
-                scooter =>
-                  scooter.location === "Em utilização"
-              )
-            )};
+          window.allScooters =
+          ${JSON.stringify(scooters)};
+
+          window.scooters =
+          ${JSON.stringify(
+            scooters.filter(
+              scooter => scooter.location === "Em utilização"
+            )
+          )};
 
 
           window.selectedScooter =
@@ -55,7 +57,7 @@ export default function Map({
 
           
           window.renderStations();
-          window.renderScooters();
+          window.renderMovingScooters();
 
 
           true;
