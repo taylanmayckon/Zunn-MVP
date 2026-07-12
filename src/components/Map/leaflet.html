@@ -55,6 +55,119 @@
                 stroke-opacity: 0.3;
             }
         }
+
+        /* Rótulo das estações */
+        .station-label {
+            margin-top: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            max-width: 120px;
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .hide-labels .station-label {
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+        }
+
+        /* --- ESTILIZAÇÃO DINÂMICA DOS PATINETES (ZOOM-RESPONSIVE) --- */
+        
+        .scooter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom center;
+        }
+
+        .scooter-battery {
+            background: #27272a;
+            color: #A3E635;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            border: 1px solid rgba(163,230,53,0.4);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 1;
+        }
+
+        .scooter-icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #18181b;
+            border: 2px solid #A3E635;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(163,230,53,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .scooter-icon-circle span {
+            color: #A3E635;
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+
+        /* Comportamento quando o patinete está SELECIONADO */
+        .scooter-container.selected {
+            transform: scale(1.25) !important; /* Mantém o destaque independente do zoom de fundo */
+            z-index: 9999;
+        }
+        .scooter-container.selected .scooter-battery {
+            background: #ffffff;
+            color: #09090b;
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+        .scooter-container.selected .scooter-icon-circle {
+            background: #A3E635;
+            border-color: #ffffff;
+            box-shadow: 0 0 16px rgba(163,230,53,0.7);
+        }
+        .scooter-container.selected .scooter-icon-circle span {
+            color: #09090b;
+        }
+
+        /* REGRAS DE ADAPTAÇÃO POR ZOOM */
+
+        /* Zoom 14: Afastando um pouco (Esconde a bateria para limpar cruzamentos) */
+        .zoom-low .scooter-container:not(.selected) {
+            transform: scale(0.85);
+        }
+        .zoom-low .scooter-battery {
+            opacity: 0;
+            transform: scale(0.7) translateY(4px);
+            pointer-events: none;
+        }
+
+        /* Zoom <= 13: Muito afastado (Vira um ponto indicador limpo e minimalista) */
+        .zoom-far .scooter-container:not(.selected) {
+            transform: scale(0.6);
+        }
+        .zoom-far .scooter-battery {
+            opacity: 0;
+            transform: scale(0.5) translateY(6px);
+            pointer-events: none;
+        }
+        .zoom-far .scooter-icon-circle {
+            box-shadow: 0 0 6px rgba(163,230,53,0.2);
+        }
+
+        /* Zoom >= 17: Muito próximo (Aumenta sutilmente para facilitar o toque na tela) */
+        .zoom-high .scooter-container:not(.selected) {
+            transform: scale(1.1);
+        }
+
     </style>
 </head>
 
@@ -77,6 +190,34 @@ L.tileLayer(
 ).addTo(map);
 
 
+// Listener central de Zoom do Mapa
+function updateZoomClasses() {
+    const mapDiv = document.getElementById("map");
+    const zoom = map.getZoom();
+    
+    // Reseta estados anteriores
+    mapDiv.classList.remove("hide-labels", "zoom-far", "zoom-low", "zoom-med", "zoom-high");
+    
+    // Controle de textos das estações
+    if (zoom < 15) {
+        mapDiv.classList.add("hide-labels");
+    }
+    
+    // Controle de escala dos patinetes
+    if (zoom <= 13) {
+        mapDiv.classList.add("zoom-far");
+    } else if (zoom === 14) {
+        mapDiv.classList.add("zoom-low");
+    } else if (zoom >= 17) {
+        mapDiv.classList.add("zoom-high");
+    } else {
+        mapDiv.classList.add("zoom-med"); // Padrão estável para níveis 15 e 16
+    }
+}
+
+map.on("zoomend", updateZoomClasses);
+
+
 const stationMarkers = [];
 const stationCircles = [];
 const movingScooterMarkers = [];
@@ -96,29 +237,16 @@ function clearMarkers(list) {
 function createScooterIcon(selected, battery) {
     return L.divIcon({
         className: "custom-marker",
-        html:
-        '<div style="display:flex;flex-direction:column;align-items:center;transform:scale(' +
-        (selected ? 1.25 : 1) +
-        ');transition:transform 0.2s;">' +
-        '<div style="background:' +
-        (selected ? "#ffffff" : "#27272a") +
-        ';color:' +
-        (selected ? "#09090b" : "#A3E635") +
-        ';padding:3px 8px;border-radius:12px;font-size:11px;font-weight:bold;margin-bottom:4px;border:1px solid rgba(163,230,53,0.4);box-shadow:0 4px 8px rgba(0,0,0,0.3);white-space:nowrap;">' +
-        '🔋 ' + battery + '%' +
-        '</div>' +
-        '<div style="width:38px;height:38px;border-radius:50%;background:' +
-        (selected ? "#A3E635" : "#18181b") +
-        ';border:2px solid ' +
-        (selected ? "#ffffff" : "#A3E635") +
-        ';display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(163,230,53,0.5);">' +
-        '<span style="color:' +
-        (selected ? "#09090b" : "#A3E635") +
-        ';font-size:18px;">⚡</span>' +
-        '</div>' +
-        '</div>',
-        iconSize:[50,70],
-        iconAnchor:[25,70]
+        html: `
+        <div class="scooter-container ${selected ? 'selected' : ''}">
+            <div class="scooter-battery">🔋 ${battery}%</div>
+            <div class="scooter-icon-circle">
+                <span>⚡</span>
+            </div>
+        </div>
+        `,
+        iconSize:[50, 70],
+        iconAnchor:[25, 70]
     });
 }
 
@@ -167,16 +295,19 @@ function createStationIcon(station, isExpanded){
         className:"",
         html:`
         <div style="display:flex;flex-direction:column;align-items:center;">
-            <div style="background:${isExpanded ? '#84CC16' : '#A3E635'}; color:#09090b; padding:5px 12px; border-radius:999px; font-weight:700; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,.35); transition: background 0.3s;">
-                🛴 ${station.availableScooters}
+            <div style="background:${isExpanded ? '#84CC16' : '#A3E635'}; color:#09090b; height:34px; padding:0 14px; border-radius:17px; display:flex; align-items:center; justify-content:center; gap:6px; font-weight:800; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,.4); border: 2px solid ${isExpanded ? '#ffffff' : 'transparent'}; transition: all 0.3s ease;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M11.236 1.077c-.503-.311-1.139-.234-1.564.19A1.5 1.5 0 0 0 9.155 2.1l-4.5 12a1.5 1.5 0 0 0 1.93 1.93l3.415-1.28v8.25a1.5 1.5 0 0 0 2.825.707l6-13.5a1.5 1.5 0 0 0-1.785-2.073l-3.805 1.087V2.5a1.5 1.5 0 0 0-1.999-1.423z"/>
+                </svg>
+                ${station.availableScooters}
             </div>
-            <div style="margin-top:5px; color:white; font-size:11px; text-align:center; text-shadow:0 2px 5px black; max-width:100px;">
+            <div class="station-label">
                 ${station.name}
             </div>
         </div>
         `,
-        iconSize:[110,70],
-        iconAnchor:[55,35]
+        iconSize:[120,70],
+        iconAnchor:[60,35]
     });
 }
 
@@ -330,6 +461,9 @@ function collapseStations(){
 
 
 function initializeMapData(){
+    // Garante que o estado correto de zoom seja aplicado imediatamente na montagem
+    updateZoomClasses();
+    
     if(window.stations && window.allScooters){
         renderStations();
         renderMovingScooters();
