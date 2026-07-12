@@ -1,6 +1,9 @@
 import { WebView } from "react-native-webview";
 import { View } from "react-native";
 
+import { scooters } from "@/data/scooters";
+import { stations } from "@/data/stations";
+
 import styles from "./styles";
 
 import type { Scooter } from "@/types";
@@ -35,35 +38,23 @@ export default function Map({
 
         injectedJavaScript={`
           
-          window.scooters = ${JSON.stringify([
-            {
-              id: "ZN-104",
-              latitude: -9.4150,
-              longitude: -40.5010,
-              battery: 85,
-              location: "Orla de Juazeiro",
-            },
-            {
-              id: "ZN-299",
-              latitude: -9.4120,
-              longitude: -40.4980,
-              battery: 42,
-              location: "Ponte Presidente Dutra",
-            },
-            {
-              id: "ZN-801",
-              latitude: -9.4080,
-              longitude: -40.4960,
-              battery: 98,
-              location: "Orla de Petrolina",
-            },
-          ])};
+          window.stations =
+            ${JSON.stringify(stations)};
+
+            window.scooters =
+            ${JSON.stringify(
+              scooters.filter(
+                scooter =>
+                  scooter.location === "Em utilização"
+              )
+            )};
 
 
           window.selectedScooter =
           ${JSON.stringify(selectedId)};
 
-
+          
+          window.renderStations();
           window.renderScooters();
 
 

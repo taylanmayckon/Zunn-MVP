@@ -132,13 +132,13 @@ export default function DrawerMenu({
 
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              GC
+              TM
             </Text>
           </View>
 
           <View>
             <Text style={styles.name}>
-              Gabriel
+              Taylan Mayckon
             </Text>
 
             <Text style={styles.subtitle}>

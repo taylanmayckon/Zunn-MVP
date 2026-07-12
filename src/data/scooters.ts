@@ -1,29 +1,120 @@
-import { Scooter } from "@/types/Scooter";
+import type { Scooter } from "@/types";
+import { stations } from "./stations";
 
-const scooters: Scooter[] = [
-  {
-    id: "ZN-104",
-    latitude: -9.415,
-    longitude: -40.501,
-    battery: 85,
-    location: "Orla de Juazeiro",
-  },
-
-  {
-    id: "ZN-299",
-    latitude: -9.412,
-    longitude: -40.498,
-    battery: 42,
-    location: "Ponte Presidente Dutra",
-  },
-
-  {
-    id: "ZN-801",
-    latitude: -9.408,
-    longitude: -40.496,
-    battery: 98,
-    location: "Orla de Petrolina",
-  },
+const batteryLevels = [
+  98, 95, 93, 90, 88,
+  85, 82, 80, 78, 76,
+  73, 70, 68, 65, 63,
+  60, 58, 55, 52, 50,
 ];
 
-export default scooters;
+const createStationScooters = (): Scooter[] => {
+
+  const scooters: Scooter[] = [];
+
+  let batteryIndex = 0;
+
+  stations.forEach((station) => {
+
+    station.scooterIds.forEach((id, index) => {
+
+      scooters.push({
+
+        id,
+
+        location: station.name,
+
+        battery: batteryLevels[batteryIndex % batteryLevels.length],
+
+        latitude:
+          station.latitude +
+          (Math.random() - 0.5) * 0.00012,
+
+        longitude:
+          station.longitude +
+          (Math.random() - 0.5) * 0.00012,
+
+      });
+
+      batteryIndex++;
+
+    });
+
+  });
+
+  return scooters;
+
+};
+
+const movingScooters: Scooter[] = [
+
+  {
+    id: "ZN901",
+    battery: 87,
+    location: "Em utilização",
+    latitude: -9.3899,
+    longitude: -40.5018,
+  },
+
+  {
+    id: "ZN902",
+    battery: 72,
+    location: "Em utilização",
+    latitude: -9.3928,
+    longitude: -40.4966,
+  },
+
+  {
+    id: "ZN903",
+    battery: 64,
+    location: "Em utilização",
+    latitude: -9.3972,
+    longitude: -40.5029,
+  },
+
+  {
+    id: "ZN904",
+    battery: 81,
+    location: "Em utilização",
+    latitude: -9.3958,
+    longitude: -40.4944,
+  },
+
+  {
+    id: "ZN905",
+    battery: 58,
+    location: "Em utilização",
+    latitude: -9.3873,
+    longitude: -40.4978,
+  },
+
+  {
+    id: "ZN906",
+    battery: 91,
+    location: "Em utilização",
+    latitude: -9.3826,
+    longitude: -40.5001,
+  },
+
+  {
+    id: "ZN907",
+    battery: 69,
+    location: "Em utilização",
+    latitude: -9.3914,
+    longitude: -40.5063,
+  },
+
+  {
+    id: "ZN908",
+    battery: 76,
+    location: "Em utilização",
+    latitude: -9.3847,
+    longitude: -40.4928,
+  },
+
+];
+
+export const scooters: Scooter[] = [
+  ...createStationScooters(),
+  ...movingScooters,
+];

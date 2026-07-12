@@ -200,6 +200,103 @@ iconAnchor:[
 
 
 
+function renderStations(){
+
+    if(!window.stations)
+        return;
+
+    window.stations.forEach((station)=>{
+
+        L.circle(
+
+            [
+                station.latitude,
+                station.longitude
+            ],
+
+            {
+
+                radius:35,
+
+                color:"#A3E635",
+
+                fillColor:"#65A30D",
+
+                fillOpacity:0.30,
+
+                weight:2
+
+            }
+
+        ).addTo(map);
+
+
+
+        const icon = L.divIcon({
+
+            className:"station",
+
+            html:
+
+            '<div style="display:flex;flex-direction:column;align-items:center;">'
+
+            +
+
+            '<div style="background:#A3E635;color:#09090b;border-radius:999px;padding:4px 10px;font-weight:bold;">'
+
+            +
+
+            "🛴 " + station.availableScooters
+
+            +
+
+            '</div>'
+
+            +
+
+            '<div style="margin-top:4px;color:white;font-size:11px;text-shadow:0 0 4px black;">'
+
+            +
+
+            station.name
+
+            +
+
+            '</div>'
+
+            +
+
+            '</div>',
+
+            iconSize:[90,50]
+
+        });
+
+
+
+        L.marker(
+
+            [
+
+                station.latitude,
+
+                station.longitude
+
+            ],
+
+            {
+
+                icon
+
+            }
+
+        ).addTo(map);
+
+    });
+
+}
+
+
 
 function renderScooters(){
 
