@@ -1,25 +1,89 @@
-import MapView, { Marker } from "react-native-maps";
+import { WebView } from "react-native-webview";
+import { View } from "react-native";
 
 import styles from "./styles";
 
-export default function Map() {
+import type { Scooter } from "@/types";
+
+type Props = {
+  onSelectScooter?: (scooter: Scooter) => void;
+  selectedScooter?: Scooter | null;
+};
+
+
+export default function Map({
+  onSelectScooter,
+  selectedScooter,
+}: Props) {
+
+  const selectedId = selectedScooter?.id ?? null;
+
+
   return (
-    <MapView
-      provider="google"
-      style={styles.map}
-      initialRegion={{
-        latitude: -9.4121,
-        longitude: -40.4984,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      }}
-    >
-      <Marker
-        coordinate={{
-          latitude: -9.4121,
-          longitude: -40.4984,
+    <View style={styles.container}>
+
+      <WebView
+        style={styles.map}
+
+        originWhitelist={["*"]}
+
+        javaScriptEnabled={true}
+
+        source={require("./leaflet.html")}
+
+
+        injectedJavaScript={`
+          
+          window.scooters = ${JSON.stringify([
+            {
+              id: "ZN-104",
+              latitude: -9.4150,
+              longitude: -40.5010,
+              battery: 85,
+              location: "Orla de Juazeiro",
+            },
+            {
+              id: "ZN-299",
+              latitude: -9.4120,
+              longitude: -40.4980,
+              battery: 42,
+              location: "Ponte Presidente Dutra",
+            },
+            {
+              id: "ZN-801",
+              latitude: -9.4080,
+              longitude: -40.4960,
+              battery: 98,
+              location: "Orla de Petrolina",
+            },
+          ])};
+
+
+          window.selectedScooter =
+          ${JSON.stringify(selectedId)};
+
+
+          window.renderScooters();
+
+
+          true;
+        `}
+
+
+        onMessage={(event)=>{
+
+          const scooter =
+            JSON.parse(
+              event.nativeEvent.data
+            );
+
+
+          onSelectScooter?.(scooter);
+
         }}
+
       />
-    </MapView>
+
+    </View>
   );
 }
