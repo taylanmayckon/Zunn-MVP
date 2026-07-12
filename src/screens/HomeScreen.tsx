@@ -1,52 +1,135 @@
 import { View } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
 
 import Header from "@/components/Header";
 import Map from "@/components/Map";
 import BottomSheet from "@/components/BottomSheet";
 import DrawerMenu from "@/components/DrawerMenu";
+import RidePanel from "@/components/RidePanel";
 
 import type { Scooter } from "@/types";
 
 
 export default function HomeScreen() {
 
+
+  const params = useLocalSearchParams();
+
+
   const [selectedScooter, setSelectedScooter] =
     useState<Scooter | null>(null);
 
-  const [drawerOpen,setDrawerOpen] = useState(false);
+
+  const [drawerOpen,setDrawerOpen] =
+    useState(false);
+
+
+  const [rideActive,setRideActive] =
+    useState(false);
+
+
+
+  useEffect(()=>{
+
+    if(params.startRide === "true"){
+
+      setRideActive(true);
+
+    }
+
+  },[params]);
+
 
 
   return (
-    <View style={{ flex: 1 }}>
+
+    <View style={{flex:1}}>
+
 
       <Map
+
         onSelectScooter={setSelectedScooter}
+
         selectedScooter={selectedScooter}
+
       />
+
 
 
       {!drawerOpen && (
-        <Header 
+
+        <Header
+
           onMenuPress={()=>{
+
             setDrawerOpen(true);
+
           }}
+
         />
+
       )}
 
 
-      <BottomSheet
-        scooter={selectedScooter}
-        onCancel={() => setSelectedScooter(null)}
-      />
+
+
+      {
+        rideActive ? (
+
+          <RidePanel
+
+            onFinish={()=>{
+
+              setRideActive(false);
+
+              setSelectedScooter(null);
+
+            }}
+
+          />
+
+        )
+
+        :
+
+        (
+
+          <BottomSheet
+
+            scooter={selectedScooter}
+
+            onCancel={()=>{
+
+              setSelectedScooter(null);
+
+            }}
+
+          />
+
+        )
+
+      }
+
+
+
+
 
       <DrawerMenu
+
         visible={drawerOpen}
+
         onClose={()=>{
-            setDrawerOpen(false);
+
+          setDrawerOpen(false);
+
         }}
+
       />
 
+
     </View>
+
   );
+
 }

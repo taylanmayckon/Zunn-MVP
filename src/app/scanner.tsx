@@ -53,7 +53,14 @@ export default function ScannerScreen() {
 
       <Pressable
         style={styles.button}
-        onPress={() => router.push("/ride")}
+        onPress={() => 
+            router.replace({
+                pathname:"/",
+                params:{
+                startRide:"true"
+                }
+            })
+        }
       >
 
         <Text style={styles.buttonText}>
