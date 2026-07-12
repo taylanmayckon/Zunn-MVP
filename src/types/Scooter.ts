@@ -1,5 +1,8 @@
 export interface Scooter {
+
   id: string;
+
+  stationId?: string;
 
   latitude: number;
 
@@ -8,4 +11,5 @@ export interface Scooter {
   battery: number;
 
   location: string;
+
 }

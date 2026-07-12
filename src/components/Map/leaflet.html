@@ -1,24 +1,12 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    />
-
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet/dist/leaflet.css"
-    />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <style>
-        html,
-        body,
-        #map {
+        html, body, #map {
             width: 100%;
             height: 100%;
             margin: 0;
@@ -32,8 +20,23 @@
         .leaflet-control-attribution {
             display: none;
         }
-    </style>
 
+        .marker-pop {
+            animation: popIn 250ms ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -43,35 +46,18 @@
 <script>
 
 const map = L.map("map", {
-
     zoomControl: false
+}).setView([-9.4121, -40.4984], 15);
 
-}).setView(
-
-    [
-        -9.4121,
-        -40.4984
-    ],
-
-    15
-
-);
 
 L.tileLayer(
-
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-
     {
         attribution: "OpenStreetMap"
     }
-
 ).addTo(map);
 
 
-
-/* ================================
-   ESTADO
-================================ */
 
 const stationMarkers = [];
 const stationCircles = [];
@@ -81,10 +67,6 @@ const stationScooterMarkers = [];
 let expandedStation = null;
 
 
-
-/* ================================
-   HELPERS
-================================ */
 
 function clearMarkers(list) {
 
@@ -100,162 +82,86 @@ function clearMarkers(list) {
 
 
 
-/* ================================
-   ÍCONE DO PATINETE
-================================ */
-
 function createScooterIcon(selected, battery) {
 
     return L.divIcon({
 
-        className:"custom-marker",
+        className: "custom-marker",
 
         html:
 
-        '<div style="' +
-
-        'display:flex;' +
-        'flex-direction:column;' +
-        'align-items:center;' +
-
-        'transform:scale(' +
+        '<div style="display:flex;flex-direction:column;align-items:center;transform:scale(' +
         (selected ? 1.25 : 1) +
-        ');' +
+        ');transition:transform 0.2s;">' +
 
-        'transition:transform 0.2s;' +
-
-        '">' +
-
-
-
-        // bateria
-
-        '<div style="' +
-
-        'background:' +
+        '<div style="background:' +
         (selected ? "#ffffff" : "#27272a") +
-        ';' +
-
-        'color:' +
+        ';color:' +
         (selected ? "#09090b" : "#A3E635") +
-        ';' +
+        ';padding:3px 8px;border-radius:12px;font-size:11px;font-weight:bold;margin-bottom:4px;border:1px solid rgba(163,230,53,0.4);box-shadow:0 4px 8px rgba(0,0,0,0.3);white-space:nowrap;">' +
 
-        'padding:3px 8px;' +
-
-        'border-radius:12px;' +
-
-        'font-size:11px;' +
-
-        'font-weight:bold;' +
-
-        'margin-bottom:4px;' +
-
-        'border:1px solid rgba(163,230,53,0.4);' +
-
-        'box-shadow:0 4px 8px rgba(0,0,0,0.3);' +
-
-        'white-space:nowrap;' +
-
-        '">' +
-
-        '🔋 ' +
-
-        battery +
-
-        '%' +
+        '🔋 ' + battery + '%' +
 
         '</div>' +
 
-
-
-
-
-        // círculo
-
-        '<div style="' +
-
-        'width:38px;' +
-
-        'height:38px;' +
-
-        'border-radius:50%;' +
-
-        'background:' +
-
+        '<div style="width:38px;height:38px;border-radius:50%;background:' +
         (selected ? "#A3E635" : "#18181b") +
-
-        ';' +
-
-        'border:2px solid ' +
-
+        ';border:2px solid ' +
         (selected ? "#ffffff" : "#A3E635") +
+        ';display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(163,230,53,0.5);">' +
 
-        ';' +
-
-        'display:flex;' +
-
-        'align-items:center;' +
-
-        'justify-content:center;' +
-
-        'box-shadow:0 0 12px rgba(163,230,53,0.5);' +
-
-        '">' +
-
-
-
-        '<span style="' +
-
-        'color:' +
-
+        '<span style="color:' +
         (selected ? "#09090b" : "#A3E635") +
-
-        ';' +
-
-        'font-size:18px;' +
-
-        '">' +
-
-        '⚡' +
-
-        '</span>' +
-
-
+        ';font-size:18px;">⚡</span>' +
 
         '</div>' +
-
-
 
         '</div>',
 
-
-
         iconSize:[50,70],
 
-
         iconAnchor:[25,70]
-
 
     });
 
 }
 
 
-function createScooterMarker(scooter) {
+
+function sendScooterMessage(scooter){
+
+    if(window.ReactNativeWebView){
+
+        window.ReactNativeWebView.postMessage(
+
+            JSON.stringify({
+
+                type:"scooter",
+
+                scooter
+
+            })
+
+        );
+
+    }
+
+}
+
+
+
+function createScooterMarker(scooter){
 
     const marker = L.marker(
 
         [
-
             scooter.latitude,
-
             scooter.longitude
-
         ],
 
         {
 
-            icon: createScooterIcon(
+            icon:createScooterIcon(
 
                 window.selectedScooter === scooter.id,
 
@@ -268,23 +174,11 @@ function createScooterMarker(scooter) {
     );
 
 
+    marker.on("click",()=>{
 
-    marker.on("click", () => {
-
-        window.ReactNativeWebView.postMessage(
-
-            JSON.stringify({
-
-                type: "scooter",
-
-                scooter
-
-            })
-
-        );
+        sendScooterMessage(scooter);
 
     });
-
 
 
     return marker;
@@ -292,58 +186,41 @@ function createScooterMarker(scooter) {
 }
 
 
-/* ================================
-   ESTAÇÕES
-================================ */
 
-function createStationIcon(station) {
+function createExpandedScooterMarker(scooter){
+
+    return createScooterMarker(scooter);
+
+}
+
+
+
+function createStationIcon(station){
 
     return L.divIcon({
 
-        className: "",
+        className:"",
 
-        html:
+        html:`
 
-        `
-        <div
-            style="
-                display:flex;
-                flex-direction:column;
-                align-items:center;
-            "
-        >
+        <div style="display:flex;flex-direction:column;align-items:center;">
 
-            <div
-                style="
-                    background:#A3E635;
-                    color:#09090b;
-                    padding:5px 12px;
-                    border-radius:999px;
-                    font-weight:700;
-                    font-size:13px;
-                    box-shadow:0 4px 10px rgba(0,0,0,.35);
-                "
-            >
+            <div style="background:#A3E635;color:#09090b;padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 4px 10px rgba(0,0,0,.35);">
+
                 🛴 ${station.availableScooters}
+
             </div>
 
 
-            <div
-                style="
-                    margin-top:5px;
-                    color:white;
-                    font-size:11px;
-                    text-align:center;
-                    text-shadow:0 2px 5px black;
-                    max-width:100px;
-                "
-            >
+            <div style="margin-top:5px;color:white;font-size:11px;text-align:center;text-shadow:0 2px 5px black;max-width:100px;">
+
                 ${station.name}
+
             </div>
 
         </div>
-        `,
 
+        `,
 
         iconSize:[110,70],
 
@@ -352,7 +229,6 @@ function createStationIcon(station) {
     });
 
 }
-
 
 
 
@@ -368,7 +244,7 @@ function renderStations(){
     });
 
 
-    stationCircles.length = 0;
+    stationCircles.length=0;
 
 
 
@@ -381,14 +257,11 @@ function renderStations(){
     window.stations.forEach(station=>{
 
 
-        const circle = L.circle(
+        const circle=L.circle(
 
             [
-
                 station.latitude,
-
                 station.longitude
-
             ],
 
             {
@@ -410,19 +283,15 @@ function renderStations(){
 
         circle.addTo(map);
 
-
         stationCircles.push(circle);
 
 
 
-        const marker = L.marker(
+        const marker=L.marker(
 
             [
-
                 station.latitude,
-
                 station.longitude
-
             ],
 
             {
@@ -434,38 +303,25 @@ function renderStations(){
         );
 
 
-
         marker.addTo(map);
 
 
 
-        marker.on(
+        marker.on("click",()=>{
 
-            "click",
+            if(expandedStation===station.id){
 
-            ()=>{
-
-
-                if(
-
-                    expandedStation === station.id
-
-                ){
-
-                    collapseStations();
-
-                }
-
-                else{
-
-                    expandStation(station);
-
-                }
-
+                collapseStations();
 
             }
 
-        );
+            else{
+
+                expandStation(station);
+
+            }
+
+        });
 
 
 
@@ -474,26 +330,14 @@ function renderStations(){
 
     });
 
-
 }
 
 
 
 
-
-/* ================================
-   PATINETES EM MOVIMENTO
-================================ */
-
-
 function renderMovingScooters(){
 
-
-    clearMarkers(
-
-        movingScooterMarkers
-
-    );
+    clearMarkers(movingScooterMarkers);
 
 
     if(!window.scooters)
@@ -502,30 +346,19 @@ function renderMovingScooters(){
 
 
 
-    window.scooters.forEach(
-
-        scooter=>{
+    window.scooters.forEach(scooter=>{
 
 
-            const marker =
-
-                createScooterMarker(
-
-                    scooter
-
-                );
+        const marker=createScooterMarker(scooter);
 
 
-            marker.addTo(map);
+        marker.addTo(map);
 
 
-            movingScooterMarkers.push(marker);
+        movingScooterMarkers.push(marker);
 
 
-        }
-
-    );
-
+    });
 
 }
 
@@ -533,248 +366,120 @@ function renderMovingScooters(){
 
 
 
-
-/* ================================
-   EXPANDIR ESTAÇÃO
-================================ */
-
-
 function expandStation(station){
-
 
     collapseStations();
 
 
-
-    expandedStation = station.id;
-
+    expandedStation=station.id;
 
 
-    const stationScooters =
+    const stationScooters=(window.allScooters || [])
 
-        window.allScooters.filter(
+        .filter(
 
-            scooter =>
-
-                scooter.stationId === station.id
+            scooter=>scooter.stationId===station.id
 
         );
 
 
 
-    stationScooters.forEach(
-
-        (
-
-            scooter,
-
-            index
-
-        )=>{
+    stationScooters.forEach((scooter,index)=>{
 
 
-            const angle =
+        const angle=(index/stationScooters.length)*Math.PI*2;
 
-                (
 
-                    index /
-
-                    stationScooters.length
-
-                )
-
-                *
-
-                Math.PI
-
-                *
-
-                2;
+        const radius=0.00030;
 
 
 
-            const radius = 0.00030;
+        const expandedScooter={
+
+            ...scooter,
+
+            latitude:
+
+                station.latitude+
+
+                Math.cos(angle)*radius,
+
+
+            longitude:
+
+                station.longitude+
+
+                Math.sin(angle)*radius
+
+        };
 
 
 
-            const expandedScooter = {
+        const marker=createExpandedScooterMarker(expandedScooter);
 
 
-                ...scooter,
-
-
-                latitude:
-
-                    station.latitude
-
-                    +
-
-                    Math.cos(angle)
-
-                    *
-
-                    radius,
+        marker.addTo(map);
 
 
 
-                longitude:
-
-                    station.longitude
-
-                    +
-
-                    Math.sin(angle)
-
-                    *
-
-                    radius
+        stationScooterMarkers.push(marker);
 
 
-            };
-
-
-
-            const marker =
-
-                createScooterMarker(
-
-                    expandedScooter
-
-                );
-
-
-
-            marker.addTo(map);
-
-
-
-            stationScooterMarkers.push(marker);
-
-
-        }
-
-    );
-
+    });
 
 }
-
-
-
-
-
-
-/* ================================
-   FECHAR ESTAÇÃO
-================================ */
 
 
 function collapseStations(){
 
+    clearMarkers(stationScooterMarkers);
 
-    clearMarkers(
-
-        stationScooterMarkers
-
-    );
-
-
-    expandedStation = null;
-
+    expandedStation=null;
 
 }
 
 
- 
-/* ================================
-   CONEXÃO REACT NATIVE
-================================ */
 
+window.renderStations=renderStations;
 
-window.renderStations = renderStations;
+window.renderMovingScooters=renderMovingScooters;
 
-window.renderMovingScooters = renderMovingScooters;
-
-
-
-/* ================================
-   RECEBER DADOS
-================================ */
 
 
 function initializeMapData(){
 
-
-    if(
-
-        window.stations
-
-        &&
-
-        window.allScooters
-
-    ){
-
+    if(window.stations && window.allScooters){
 
         renderStations();
 
-
         renderMovingScooters();
 
-
     }
-
 
 }
 
 
 
-
-/* ================================
-   FECHAR ESTAÇÃO AO TOCAR NO MAPA
-================================ */
-
-
-map.on(
-
-    "click",
-
-    ()=>{
-
-
-        collapseStations();
-
-
-    }
-
-);
+window.initializeMapData = initializeMapData;
 
 
 
+map.on("click",()=>{
+
+    collapseStations();
+
+});
 
 
-/* ================================
-   ATUALIZAÇÃO DE SELEÇÃO
-================================ */
+
+window.updateSelectedScooter=function(id){
+
+    window.selectedScooter=id;
 
 
-window.updateSelectedScooter = function(id){
+    clearMarkers(movingScooterMarkers);
 
-
-    window.selectedScooter = id;
-
-
-    clearMarkers(
-
-        movingScooterMarkers
-
-    );
-
-
-    clearMarkers(
-
-        stationScooterMarkers
-
-    );
+    clearMarkers(stationScooterMarkers);
 
 
     renderMovingScooters();
@@ -783,17 +488,13 @@ window.updateSelectedScooter = function(id){
 
     if(expandedStation){
 
-
-        const station =
+        const station=
 
             window.stations.find(
 
-                item =>
-
-                item.id === expandedStation
+                item=>item.id===expandedStation
 
             );
-
 
 
         if(station){
@@ -802,34 +503,12 @@ window.updateSelectedScooter = function(id){
 
         }
 
-
     }
-
 
 };
 
 
-
-
-
-/* ================================
-   INICIALIZAÇÃO
-================================ */
-
-
-setTimeout(()=>{
-
-
-    initializeMapData();
-
-
-},500);
-
-
-
 </script>
 
-
 </body>
-
 </html>

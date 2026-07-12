@@ -1,120 +1,216 @@
 import type { Scooter } from "@/types";
 import { stations } from "./stations";
 
+
+
 const batteryLevels = [
-  98, 95, 93, 90, 88,
-  85, 82, 80, 78, 76,
-  73, 70, 68, 65, 63,
-  60, 58, 55, 52, 50,
+
+    98,95,93,90,88,
+
+    85,82,80,78,76,
+
+    73,70,68,65,63,
+
+    60,58,55,52,50,
+
 ];
+
+
 
 const createStationScooters = (): Scooter[] => {
 
-  const scooters: Scooter[] = [];
 
-  let batteryIndex = 0;
+    const scooters: Scooter[] = [];
 
-  stations.forEach((station) => {
+    let batteryIndex = 0;
 
-    station.scooterIds.forEach((id, index) => {
 
-      scooters.push({
 
-        id,
+    stations.forEach((station)=>{
 
-        location: station.name,
 
-        battery: batteryLevels[batteryIndex % batteryLevels.length],
+        station.scooterIds.forEach((id)=>{
 
-        latitude:
-          station.latitude +
-          (Math.random() - 0.5) * 0.00012,
 
-        longitude:
-          station.longitude +
-          (Math.random() - 0.5) * 0.00012,
+            scooters.push({
 
-      });
 
-      batteryIndex++;
+                id,
+
+
+                stationId: station.id,
+
+
+                location: station.name,
+
+
+                battery:
+                    batteryLevels[
+                        batteryIndex %
+                        batteryLevels.length
+                    ],
+
+
+
+                /*
+                    Ajuste manual da posição:
+
+                    latitude:
+                    + aumenta para norte
+                    - aumenta para sul
+
+                    longitude:
+                    + aumenta para leste
+                    - aumenta para oeste
+
+                    Exemplo:
+                    latitudeOffset: 0.00005
+                */
+
+
+                latitude:
+                    station.latitude,
+
+
+                longitude:
+                    station.longitude,
+
+
+            });
+
+
+            batteryIndex++;
+
+
+        });
+
 
     });
 
-  });
 
-  return scooters;
+    return scooters;
 
 };
 
+
+
+
+
 const movingScooters: Scooter[] = [
 
-  {
-    id: "ZN901",
-    battery: 87,
-    location: "Em utilização",
-    latitude: -9.3899,
-    longitude: -40.5018,
-  },
 
-  {
-    id: "ZN902",
-    battery: 72,
-    location: "Em utilização",
-    latitude: -9.3928,
-    longitude: -40.4966,
-  },
+    {
+        id:"ZN901",
 
-  {
-    id: "ZN903",
-    battery: 64,
-    location: "Em utilização",
-    latitude: -9.3972,
-    longitude: -40.5029,
-  },
+        battery:87,
 
-  {
-    id: "ZN904",
-    battery: 81,
-    location: "Em utilização",
-    latitude: -9.3958,
-    longitude: -40.4944,
-  },
+        location:"Em utilização",
 
-  {
-    id: "ZN905",
-    battery: 58,
-    location: "Em utilização",
-    latitude: -9.3873,
-    longitude: -40.4978,
-  },
+        latitude:-9.3899,
 
-  {
-    id: "ZN906",
-    battery: 91,
-    location: "Em utilização",
-    latitude: -9.3826,
-    longitude: -40.5001,
-  },
+        longitude:-40.5018,
+    },
 
-  {
-    id: "ZN907",
-    battery: 69,
-    location: "Em utilização",
-    latitude: -9.3914,
-    longitude: -40.5063,
-  },
 
-  {
-    id: "ZN908",
-    battery: 76,
-    location: "Em utilização",
-    latitude: -9.3847,
-    longitude: -40.4928,
-  },
+    {
+        id:"ZN902",
+
+        battery:72,
+
+        location:"Em utilização",
+
+        latitude:-9.3928,
+
+        longitude:-40.4966,
+    },
+
+
+    {
+        id:"ZN903",
+
+        battery:64,
+
+        location:"Em utilização",
+
+        latitude:-9.3972,
+
+        longitude:-40.5029,
+    },
+
+
+    {
+        id:"ZN904",
+
+        battery:81,
+
+        location:"Em utilização",
+
+        latitude:-9.3958,
+
+        longitude:-40.4944,
+    },
+
+
+    {
+        id:"ZN905",
+
+        battery:58,
+
+        location:"Em utilização",
+
+        latitude:-9.3873,
+
+        longitude:-40.4978,
+    },
+
+
+    {
+        id:"ZN906",
+
+        battery:91,
+
+        location:"Em utilização",
+
+        latitude:-9.3826,
+
+        longitude:-40.5001,
+    },
+
+
+    {
+        id:"ZN907",
+
+        battery:69,
+
+        location:"Em utilização",
+
+        latitude:-9.3914,
+
+        longitude:-40.5063,
+    },
+
+
+    {
+        id:"ZN908",
+
+        battery:76,
+
+        location:"Em utilização",
+
+        latitude:-9.3847,
+
+        longitude:-40.4928,
+    },
+
 
 ];
 
+
+
 export const scooters: Scooter[] = [
-  ...createStationScooters(),
-  ...movingScooters,
+
+    ...createStationScooters(),
+
+    ...movingScooters,
+
 ];

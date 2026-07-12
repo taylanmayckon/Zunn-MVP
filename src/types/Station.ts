@@ -1,4 +1,5 @@
 export type Station = {
+
   id: string;
 
   name: string;
@@ -12,4 +13,5 @@ export type Station = {
   availableScooters: number;
 
   scooterIds: string[];
+
 };
