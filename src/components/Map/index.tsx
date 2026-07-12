@@ -34,7 +34,7 @@ export default function Map({
           window.stations = ${JSON.stringify(stations)};
           window.allScooters = ${JSON.stringify(scooters)};
           window.scooters = ${JSON.stringify(
-            scooters.filter(scooter => scooter.location === "Em utilização")
+            scooters.filter(scooter => scooter.status === "in_use")
           )};
           window.selectedScooter = ${JSON.stringify(selectedId)};
           

@@ -33,49 +33,13 @@ const createStationScooters = (): Scooter[] => {
 
 
             scooters.push({
-
-
                 id,
-
-
                 stationId: station.id,
-
-
                 location: station.name,
-
-
-                battery:
-                    batteryLevels[
-                        batteryIndex %
-                        batteryLevels.length
-                    ],
-
-
-
-                /*
-                    Ajuste manual da posição:
-
-                    latitude:
-                    + aumenta para norte
-                    - aumenta para sul
-
-                    longitude:
-                    + aumenta para leste
-                    - aumenta para oeste
-
-                    Exemplo:
-                    latitudeOffset: 0.00005
-                */
-
-
-                latitude:
-                    station.latitude,
-
-
-                longitude:
-                    station.longitude,
-
-
+                battery: batteryLevels[batteryIndex % batteryLevels.length],
+                latitude: station.latitude,
+                longitude: station.longitude,
+                status: "available", // <-- AQUI
             });
 
 
@@ -109,6 +73,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3899,
 
         longitude:-40.5018,
+        status: "in_use"
     },
 
 
@@ -122,6 +87,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3928,
 
         longitude:-40.4966,
+        status: "in_use"
     },
 
 
@@ -135,6 +101,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3972,
 
         longitude:-40.5029,
+        status: "in_use"
     },
 
 
@@ -148,6 +115,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3958,
 
         longitude:-40.4944,
+        status: "in_use"
     },
 
 
@@ -161,6 +129,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3873,
 
         longitude:-40.4978,
+        status: "in_use"
     },
 
 
@@ -174,6 +143,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3826,
 
         longitude:-40.5001,
+        status: "in_use"
     },
 
 
@@ -187,6 +157,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3914,
 
         longitude:-40.5063,
+        status: "in_use"
     },
 
 
@@ -200,6 +171,7 @@ const movingScooters: Scooter[] = [
         latitude:-9.3847,
 
         longitude:-40.4928,
+        status: "in_use"
     },
 
 

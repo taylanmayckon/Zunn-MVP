@@ -26,37 +26,20 @@
         }
 
         @keyframes popIn {
-            from {
-                transform: scale(0.2);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+            from { transform: scale(0.2); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        /* Animação de respiração suave para o círculo de raio da estação */
         .circle-active-pulse {
             animation: circleBreathe 2.5s infinite ease-in-out;
         }
 
         @keyframes circleBreathe {
-            0% {
-                fill-opacity: 0.08;
-                stroke-opacity: 0.3;
-            }
-            50% {
-                fill-opacity: 0.18;
-                stroke-opacity: 0.7;
-            }
-            100% {
-                fill-opacity: 0.08;
-                stroke-opacity: 0.3;
-            }
+            0% { fill-opacity: 0.08; stroke-opacity: 0.3; }
+            50% { fill-opacity: 0.18; stroke-opacity: 0.7; }
+            100% { fill-opacity: 0.08; stroke-opacity: 0.3; }
         }
 
-        /* Rótulo das estações */
         .station-label {
             margin-top: 6px;
             color: white;
@@ -73,8 +56,6 @@
             transform: translateY(-4px);
             pointer-events: none;
         }
-
-        /* --- ESTILIZAÇÃO DINÂMICA DOS PATINETES (ZOOM-RESPONSIVE) --- */
         
         .scooter-container {
             display: flex;
@@ -118,9 +99,9 @@
             transition: color 0.2s;
         }
 
-        /* Comportamento quando o patinete está SELECIONADO */
+        /* COMPORTAMENTO: SELECIONADO */
         .scooter-container.selected {
-            transform: scale(1.25) !important; /* Mantém o destaque independente do zoom de fundo */
+            transform: scale(1.25) !important;
             z-index: 9999;
         }
         .scooter-container.selected .scooter-battery {
@@ -138,36 +119,25 @@
             color: #09090b;
         }
 
-        /* REGRAS DE ADAPTAÇÃO POR ZOOM */
-
-        /* Zoom 14: Afastando um pouco (Esconde a bateria para limpar cruzamentos) */
-        .zoom-low .scooter-container:not(.selected) {
-            transform: scale(0.85);
+        /* COMPORTAMENTO: EM USO (BLOQUEADO) */
+        .scooter-container.in-use {
+            opacity: 0.55; /* Fica semi-transparente */
+            pointer-events: none; /* Bloqueia cliques no CSS */
+            filter: grayscale(0.5); /* Tira um pouco da cor para indicar indisponibilidade */
         }
-        .zoom-low .scooter-battery {
-            opacity: 0;
-            transform: scale(0.7) translateY(4px);
-            pointer-events: none;
+        .scooter-container.in-use .scooter-battery {
+            display: none; /* Remove a bateria para não poluir o mapa com patinetes de outros */
         }
 
-        /* Zoom <= 13: Muito afastado (Vira um ponto indicador limpo e minimalista) */
-        .zoom-far .scooter-container:not(.selected) {
-            transform: scale(0.6);
-        }
-        .zoom-far .scooter-battery {
-            opacity: 0;
-            transform: scale(0.5) translateY(6px);
-            pointer-events: none;
-        }
-        .zoom-far .scooter-icon-circle {
-            box-shadow: 0 0 6px rgba(163,230,53,0.2);
-        }
+        /* RESPONSIVIDADE DE ZOOM */
+        .zoom-low .scooter-container:not(.selected) { transform: scale(0.85); }
+        .zoom-low .scooter-battery { opacity: 0; transform: scale(0.7) translateY(4px); pointer-events: none; }
 
-        /* Zoom >= 17: Muito próximo (Aumenta sutilmente para facilitar o toque na tela) */
-        .zoom-high .scooter-container:not(.selected) {
-            transform: scale(1.1);
-        }
+        .zoom-far .scooter-container:not(.selected) { transform: scale(0.6); }
+        .zoom-far .scooter-battery { opacity: 0; transform: scale(0.5) translateY(6px); pointer-events: none; }
+        .zoom-far .scooter-icon-circle { box-shadow: 0 0 6px rgba(163,230,53,0.2); }
 
+        .zoom-high .scooter-container:not(.selected) { transform: scale(1.1); }
     </style>
 </head>
 
@@ -176,34 +146,21 @@
 <div id="map"></div>
 
 <script>
-
-const map = L.map("map", {
-    zoomControl: false
-}).setView([-9.4121, -40.4984], 15);
-
+const map = L.map("map", { zoomControl: false }).setView([-9.4121, -40.4984], 15);
 
 L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    {
-        attribution: "OpenStreetMap"
-    }
+    { attribution: "OpenStreetMap" }
 ).addTo(map);
 
-
-// Listener central de Zoom do Mapa
 function updateZoomClasses() {
     const mapDiv = document.getElementById("map");
     const zoom = map.getZoom();
     
-    // Reseta estados anteriores
     mapDiv.classList.remove("hide-labels", "zoom-far", "zoom-low", "zoom-med", "zoom-high");
     
-    // Controle de textos das estações
-    if (zoom < 15) {
-        mapDiv.classList.add("hide-labels");
-    }
+    if (zoom < 15) mapDiv.classList.add("hide-labels");
     
-    // Controle de escala dos patinetes
     if (zoom <= 13) {
         mapDiv.classList.add("zoom-far");
     } else if (zoom === 14) {
@@ -211,12 +168,11 @@ function updateZoomClasses() {
     } else if (zoom >= 17) {
         mapDiv.classList.add("zoom-high");
     } else {
-        mapDiv.classList.add("zoom-med"); // Padrão estável para níveis 15 e 16
+        mapDiv.classList.add("zoom-med");
     }
 }
 
 map.on("zoomend", updateZoomClasses);
-
 
 const stationMarkers = [];
 const stationCircles = [];
@@ -225,20 +181,18 @@ const stationScooterMarkers = [];
 
 let expandedStation = null;
 
-
 function clearMarkers(list) {
-    list.forEach(marker => {
-        map.removeLayer(marker);
-    });
+    list.forEach(marker => map.removeLayer(marker));
     list.length = 0;
 }
 
-
-function createScooterIcon(selected, battery) {
+// ATUALIZADO: Recebe o status para adicionar a classe "in-use"
+function createScooterIcon(selected, battery, status) {
+    const isAvailable = status === "available";
     return L.divIcon({
         className: "custom-marker",
         html: `
-        <div class="scooter-container ${selected ? 'selected' : ''}">
+        <div class="scooter-container ${selected ? 'selected' : ''} ${!isAvailable ? 'in-use' : ''}">
             <div class="scooter-battery">🔋 ${battery}%</div>
             <div class="scooter-icon-circle">
                 <span>⚡</span>
@@ -250,45 +204,40 @@ function createScooterIcon(selected, battery) {
     });
 }
 
-
 function sendScooterMessage(scooter){
     if(window.ReactNativeWebView){
         window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-                type:"scooter",
-                scooter
-            })
+            JSON.stringify({ type:"scooter", scooter })
         );
     }
 }
 
-
+// ATUALIZADO: Verifica o status antes de atrelar o evento de clique
 function createScooterMarker(scooter){
     const marker = L.marker(
-        [
-            scooter.latitude,
-            scooter.longitude
-        ],
+        [scooter.latitude, scooter.longitude],
         {
-            icon:createScooterIcon(
+            icon: createScooterIcon(
                 window.selectedScooter === scooter.id,
-                scooter.battery
+                scooter.battery,
+                scooter.status // Passando o status
             )
         }
     );
 
-    marker.on("click",()=>{
-        sendScooterMessage(scooter);
-    });
+    // Proteção via JavaScript: Só permite clique e abrir BottomSheet se estiver disponível
+    if (scooter.status === "available") {
+        marker.on("click", () => {
+            sendScooterMessage(scooter);
+        });
+    }
 
     return marker;
 }
 
-
 function createExpandedScooterMarker(scooter){
     return createScooterMarker(scooter);
 }
-
 
 function createStationIcon(station, isExpanded){
     return L.divIcon({
@@ -301,9 +250,7 @@ function createStationIcon(station, isExpanded){
                 </svg>
                 ${station.availableScooters}
             </div>
-            <div class="station-label">
-                ${station.name}
-            </div>
+            <div class="station-label">${station.name}</div>
         </div>
         `,
         iconSize:[120,70],
@@ -311,26 +258,18 @@ function createStationIcon(station, isExpanded){
     });
 }
 
-
 function renderStations(){
     clearMarkers(stationMarkers);
+    stationCircles.forEach(circle => map.removeLayer(circle));
+    stationCircles.length = 0;
 
-    stationCircles.forEach(circle=>{
-        map.removeLayer(circle);
-    });
-    stationCircles.length=0;
+    if(!window.stations) return;
 
-    if(!window.stations)
-        return;
-
-    window.stations.forEach(station=>{
+    window.stations.forEach(station => {
         const isCurrentExpanded = expandedStation === station.id;
 
-        const circle=L.circle(
-            [
-                station.latitude,
-                station.longitude
-            ],
+        const circle = L.circle(
+            [station.latitude, station.longitude],
             {
                 radius:45,
                 color:"#A3E635",
@@ -348,23 +287,17 @@ function renderStations(){
             circle._path.classList.add("circle-active-pulse");
         }
 
-        const marker=L.marker(
-            [
-                station.latitude,
-                station.longitude
-            ],
-            {
-                icon:createStationIcon(station, isCurrentExpanded)
-            }
+        const marker = L.marker(
+            [station.latitude, station.longitude],
+            { icon: createStationIcon(station, isCurrentExpanded) }
         );
 
         marker.addTo(map);
 
-        marker.on("click",()=>{
-            if(expandedStation===station.id){
+        marker.on("click", () => {
+            if(expandedStation === station.id){
                 collapseStations();
-            }
-            else{
+            } else {
                 expandStation(station);
             }
         });
@@ -374,65 +307,48 @@ function renderStations(){
     });
 }
 
-
 function renderMovingScooters(){
     clearMarkers(movingScooterMarkers);
+    if(!window.scooters) return;
 
-    if(!window.scooters)
-        return;
-
-    window.scooters.forEach(scooter=>{
-        const marker=createScooterMarker(scooter);
+    window.scooters.forEach(scooter => {
+        const marker = createScooterMarker(scooter);
         marker.addTo(map);
         movingScooterMarkers.push(marker);
     });
 }
 
-
 function expandStation(station){
     collapseStations();
-
-    expandedStation=station.id;
+    expandedStation = station.id;
 
     if (station.markerRef) {
         station.markerRef.setIcon(createStationIcon(station, true));
     }
-
     if (station.circleRef) {
-        station.circleRef.setStyle({
-            fillOpacity: 0.12,
-            weight: 1.5
-        });
+        station.circleRef.setStyle({ fillOpacity: 0.12, weight: 1.5 });
         if (station.circleRef._path) {
             station.circleRef._path.classList.add("circle-active-pulse");
         }
     }
 
-    const stationScooters=(window.allScooters || [])
-        .filter(
-            scooter=>scooter.stationId===station.id
-        );
+    const stationScooters = (window.allScooters || []).filter(scooter => scooter.stationId === station.id);
 
-    stationScooters.forEach((scooter,index)=>{
-        const angle=(index/stationScooters.length)*Math.PI*2;
-        const radius=0.00030;
+    stationScooters.forEach((scooter, index) => {
+        const angle = (index / stationScooters.length) * Math.PI * 2;
+        const radius = 0.00030;
 
-        const expandedScooter={
+        const expandedScooter = {
             ...scooter,
-            latitude:
-                station.latitude+
-                Math.cos(angle)*radius,
-            longitude:
-                station.longitude+
-                Math.sin(angle)*radius
+            latitude: station.latitude + Math.cos(angle) * radius,
+            longitude: station.longitude + Math.sin(angle) * radius
         };
 
-        const marker=createExpandedScooterMarker(expandedScooter);
+        const marker = createExpandedScooterMarker(expandedScooter);
         marker.addTo(map);
         stationScooterMarkers.push(marker);
     });
 }
-
 
 function collapseStations(){
     if (expandedStation && window.stations) {
@@ -442,28 +358,19 @@ function collapseStations(){
                 prevStation.markerRef.setIcon(createStationIcon(prevStation, false));
             }
             if (prevStation.circleRef) {
-                prevStation.circleRef.setStyle({
-                    color: "#A3E635",
-                    fillColor: "#65A30D",
-                    fillOpacity: 0.25,
-                    weight: 2
-                });
+                prevStation.circleRef.setStyle({ color: "#A3E635", fillColor: "#65A30D", fillOpacity: 0.25, weight: 2 });
                 if (prevStation.circleRef._path) {
                     prevStation.circleRef._path.classList.remove("circle-active-pulse");
                 }
             }
         }
     }
-
     clearMarkers(stationScooterMarkers);
-    expandedStation=null;
+    expandedStation = null;
 }
 
-
 function initializeMapData(){
-    // Garante que o estado correto de zoom seja aplicado imediatamente na montagem
     updateZoomClasses();
-    
     if(window.stations && window.allScooters){
         renderStations();
         renderMovingScooters();
@@ -472,32 +379,19 @@ function initializeMapData(){
 
 window.initializeMapData = initializeMapData;
 
+map.on("click", () => collapseStations());
 
-map.on("click",()=>{
-    collapseStations();
-});
-
-
-window.updateSelectedScooter=function(id){
-    window.selectedScooter=id;
-
+window.updateSelectedScooter = function(id){
+    window.selectedScooter = id;
     clearMarkers(movingScooterMarkers);
     clearMarkers(stationScooterMarkers);
-
     renderMovingScooters();
 
     if(expandedStation){
-        const station=
-            window.stations.find(
-                item=>item.id===expandedStation
-            );
-
-        if(station){
-            expandStation(station);
-        }
+        const station = window.stations.find(item => item.id === expandedStation);
+        if(station) expandStation(station);
     }
 };
-
 </script>
 
 </body>
