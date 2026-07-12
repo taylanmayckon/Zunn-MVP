@@ -1,14 +1,18 @@
-import { View, Text } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { Menu, Wallet, Zap } from "lucide-react-native";
 
 import IconButton from "../IconButton";
 
 import styles from "./styles";
 
-export default function Header() {
+type Props = {
+  onMenuPress: () => void;
+};
+
+export default function Header({ onMenuPress }: Props) {
   return (
     <View style={styles.container}>
-      <IconButton onPress={() => {}}>
+      <IconButton onPress={onMenuPress}>
         <Menu color="white" size={24} />
       </IconButton>
 
