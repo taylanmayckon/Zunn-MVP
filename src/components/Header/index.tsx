@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Text } from "react-native";
 import { Menu, Wallet, Zap } from "lucide-react-native";
-
+import { router } from "expo-router";
 import IconButton from "../IconButton";
 
 import styles from "./styles";
@@ -24,7 +24,11 @@ export default function Header({ onMenuPress }: Props) {
         </Text>
       </View>
 
-      <IconButton onPress={() => {}}>
+      <IconButton
+        onPress={() => {
+          router.push("/wallet");
+        }}
+      >
         <Wallet color="white" size={22} />
       </IconButton>
     </View>

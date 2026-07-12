@@ -18,35 +18,29 @@ import {
   X,
 } from "lucide-react-native";
 
+import { router } from "expo-router";
 
 type Props = {
   visible: boolean;
   onClose: () => void;
 };
 
-
 export default function DrawerMenu({
   visible,
   onClose,
 }: Props) {
 
-
   const translateX = useRef(
     new Animated.Value(-300)
   ).current;
-
 
   const opacity = useRef(
     new Animated.Value(0)
   ).current;
 
-
-
   useEffect(() => {
 
-
     if (visible) {
-
 
       Animated.parallel([
 
@@ -60,7 +54,6 @@ export default function DrawerMenu({
           }
         ),
 
-
         Animated.timing(
           opacity,
           {
@@ -68,14 +61,11 @@ export default function DrawerMenu({
             duration: 200,
             useNativeDriver: true,
           }
-        )
+        ),
 
       ]).start();
 
-
-
     } else {
-
 
       Animated.parallel([
 
@@ -88,7 +78,6 @@ export default function DrawerMenu({
           }
         ),
 
-
         Animated.timing(
           opacity,
           {
@@ -96,108 +85,80 @@ export default function DrawerMenu({
             duration: 200,
             useNativeDriver: true,
           }
-        )
+        ),
 
       ]).start();
 
-
     }
 
-
   }, [visible]);
-
-
-
-
 
   return (
 
     <Animated.View
-
       style={[
         styles.overlay,
         {
           opacity,
-          pointerEvents:
-            visible
-              ? "auto"
-              : "none",
-        }
+          pointerEvents: visible ? "auto" : "none",
+        },
       ]}
-
     >
 
-
       <Animated.View
-
         style={[
           styles.container,
-
           {
-            transform:[
+            transform: [
               {
-                translateX
-              }
-            ]
-          }
-
+                translateX,
+              },
+            ],
+          },
         ]}
-
       >
-
-
 
         <TouchableOpacity
           style={styles.close}
           onPress={onClose}
         >
-
           <X
             size={26}
             color="white"
           />
-
         </TouchableOpacity>
-
-
-
-
 
         <View style={styles.profile}>
 
-
           <View style={styles.avatar}>
-
             <Text style={styles.avatarText}>
               GC
             </Text>
-
           </View>
 
-
-
           <View>
-
             <Text style={styles.name}>
               Gabriel
             </Text>
 
-
             <Text style={styles.subtitle}>
               Ver perfil
             </Text>
-
           </View>
-
 
         </View>
 
-
-
-
+        {/* MAPA */}
 
         <TouchableOpacity
           style={styles.item}
+          onPress={() => {
+
+            onClose();
+
+            router.push("/");
+
+          }}
         >
 
           <MapPin
@@ -211,13 +172,17 @@ export default function DrawerMenu({
 
         </TouchableOpacity>
 
-
-
-
-
+        {/* CARTEIRA */}
 
         <TouchableOpacity
           style={styles.item}
+          onPress={() => {
+
+            onClose();
+
+            router.push("/wallet");
+
+          }}
         >
 
           <Wallet
@@ -231,14 +196,11 @@ export default function DrawerMenu({
 
         </TouchableOpacity>
 
-
-
-
-
-
+        {/* SAIR */}
 
         <TouchableOpacity
           style={styles.logout}
+          onPress={onClose}
         >
 
           <Text style={styles.logoutText}>
@@ -247,14 +209,10 @@ export default function DrawerMenu({
 
         </TouchableOpacity>
 
-
-
-
       </Animated.View>
-
-
 
     </Animated.View>
 
   );
+
 }
