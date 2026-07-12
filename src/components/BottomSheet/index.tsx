@@ -156,7 +156,7 @@ export default function BottomSheet({
 
 
                 <Text style={styles.infoValue}>
-                  R$ 2,50
+                  R$ 2,00
                 </Text>
 
 

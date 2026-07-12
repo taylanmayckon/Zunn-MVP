@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { WebView } from "react-native-webview";
 import { View } from "react-native";
 
@@ -13,18 +14,31 @@ type Props = {
   selectedScooter?: Scooter | null;
 };
 
-
 export default function Map({
   onSelectScooter,
   selectedScooter,
 }: Props) {
-
+  // Referência para controlar a WebView silenciosamente
+  const webViewRef = useRef<WebView>(null);
   const selectedId = selectedScooter?.id ?? null;
+
+  // Atualiza o Leaflet sempre que um patinete é selecionado (sem dar reload na página)
+  useEffect(() => {
+    if (webViewRef.current) {
+      webViewRef.current.injectJavaScript(`
+        if (typeof window.updateSelectedScooter === 'function') {
+          window.updateSelectedScooter(${selectedId ? `"${selectedId}"` : "null"});
+        }
+        true;
+      `);
+    }
+  }, [selectedId]);
 
   return (
     <View style={styles.container}>
       <WebView
-        key={selectedId ?? "none"}
+        ref={webViewRef}
+        // A propriedade "key" FOI REMOVIDA para impedir o piscar em branco!
         style={styles.map}
         originWhitelist={["*"]}
         javaScriptEnabled={true}
@@ -34,7 +48,7 @@ export default function Map({
           window.stations = ${JSON.stringify(stations)};
           window.allScooters = ${JSON.stringify(scooters)};
           window.scooters = ${JSON.stringify(
-            scooters.filter(scooter => scooter.status === "in_use")
+            scooters.filter(scooter => scooter.location === "Em utilização")
           )};
           window.selectedScooter = ${JSON.stringify(selectedId)};
           
@@ -42,18 +56,17 @@ export default function Map({
           window.renderMovingScooters();
           true;
         `}
-
+        
         onMessage={(event) => {
           try {
-            // 解析 o dado recebido
             const data = JSON.parse(event.nativeEvent.data);
             
-            // Verifica se o tipo é "scooter" e passa apenas o objeto do patinete interno
+            // CORREÇÃO: Pega apenas o objeto do patinete de dentro do envelope!
             if (data && data.type === "scooter") {
               onSelectScooter?.(data.scooter);
             }
           } catch (error) {
-            console.error("Erro ao processar mensagem do mapa:", error);
+            console.error("Erro ao ler mensagem do mapa:", error);
           }
         }}
       />
