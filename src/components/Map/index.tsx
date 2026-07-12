@@ -21,63 +21,42 @@ export default function Map({
 
   const selectedId = selectedScooter?.id ?? null;
 
-
   return (
     <View style={styles.container}>
-
       <WebView
         key={selectedId ?? "none"}
         style={styles.map}
-
         originWhitelist={["*"]}
-
         javaScriptEnabled={true}
-
         source={require("./leaflet.html")}
 
-
         injectedJavaScript={`
-          
-          window.stations =
-          ${JSON.stringify(stations)};
-
-          window.allScooters =
-          ${JSON.stringify(scooters)};
-
-          window.scooters =
-          ${JSON.stringify(
-            scooters.filter(
-              scooter => scooter.location === "Em utilização"
-            )
+          window.stations = ${JSON.stringify(stations)};
+          window.allScooters = ${JSON.stringify(scooters)};
+          window.scooters = ${JSON.stringify(
+            scooters.filter(scooter => scooter.location === "Em utilização")
           )};
-
-
-          window.selectedScooter =
-          ${JSON.stringify(selectedId)};
-
+          window.selectedScooter = ${JSON.stringify(selectedId)};
           
           window.renderStations();
           window.renderMovingScooters();
-
-
           true;
         `}
 
-
-        onMessage={(event)=>{
-
-          const scooter =
-            JSON.parse(
-              event.nativeEvent.data
-            );
-
-
-          onSelectScooter?.(scooter);
-
+        onMessage={(event) => {
+          try {
+            // 解析 o dado recebido
+            const data = JSON.parse(event.nativeEvent.data);
+            
+            // Verifica se o tipo é "scooter" e passa apenas o objeto do patinete interno
+            if (data && data.type === "scooter") {
+              onSelectScooter?.(data.scooter);
+            }
+          } catch (error) {
+            console.error("Erro ao processar mensagem do mapa:", error);
+          }
         }}
-
       />
-
     </View>
   );
 }
