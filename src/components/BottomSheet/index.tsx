@@ -14,6 +14,7 @@ import styles from "./styles";
 import AppButton from "@/components/AppButton";
 
 import type { Scooter } from "@/types";
+import { router } from "expo-router";
 
 
 type Props = {
@@ -96,7 +97,7 @@ export default function BottomSheet({
 
             <AppButton
               title="Escanear QR Code"
-              onPress={()=>{}}
+              onPress={() => router.push("/scanner")}
             />
 
           </>
@@ -185,11 +186,8 @@ export default function BottomSheet({
 
 
             <AppButton
-
-              title="Escanear para Desbloquear"
-
-              onPress={()=>{}}
-
+                title="Escanear para Desbloquear"
+                onPress={() => router.push("/scanner")}
             />
 
 
