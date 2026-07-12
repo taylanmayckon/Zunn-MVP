@@ -1,33 +1,101 @@
-import { Colors } from "@/constants";
-import { StyleSheet } from "react-native";
+import {
+  StyleSheet
+} from "react-native";
+
 
 export default StyleSheet.create({
-  button: {
-    height: 56,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 
-  primary: {
-    backgroundColor: Colors.primary,
-  },
+button:{
 
-  secondary: {
-    backgroundColor: Colors.surface,
-  },
 
-  danger: {
-    backgroundColor: Colors.danger,
-  },
+  width:"100%",
 
-  text: {
-    color: Colors.black,
-    fontSize: 18,
-    fontWeight: "700",
-  },
 
-  pressed: {
-    opacity: 0.8,
-  },
+  backgroundColor:"#A3E635",
+
+
+  paddingVertical:16,
+
+
+  borderRadius:18,
+
+
+  alignItems:"center",
+
+
+  justifyContent:"center",
+
+
+},
+
+
+
+text:{
+
+
+  color:"#09090B",
+
+
+  fontSize:17,
+
+
+  fontWeight:"700",
+
+
+},
+
+
+
+secondary:{
+
+
+  backgroundColor:"#18181B",
+
+
+  borderWidth:1,
+
+
+  borderColor:"#3F3F46",
+
+
+},
+
+
+
+secondaryText:{
+
+
+  color:"#D4D4D8",
+
+},
+
+
+
+ghost:{
+
+
+  backgroundColor:"transparent",
+
+
+  paddingVertical:10,
+
+
+},
+
+
+
+ghostText:{
+
+
+  color:"#A1A1AA",
+
+
+  fontSize:15,
+
+
+  fontWeight:"600",
+
+},
+
+
 });

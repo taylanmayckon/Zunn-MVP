@@ -184,22 +184,22 @@ export default function BottomSheet({
             </View>
 
 
-
-
             <AppButton
 
-              title="Cancelar"
+              title="Escanear para Desbloquear"
 
-              onPress={onCancel}
+              onPress={()=>{}}
 
             />
 
 
             <AppButton
 
-              title="Escanear para Desbloquear"
+              title="Cancelar"
 
-              onPress={()=>{}}
+              variant="ghost"
+
+              onPress={onCancel}
 
             />
 

@@ -1,27 +1,78 @@
-import { Pressable, Text } from "react-native";
+import {
+  TouchableOpacity,
+  Text
+} from "react-native";
+
 import styles from "./styles";
 
+
 type Props = {
+
   title: string;
+
   onPress: () => void;
-  variant?: "primary" | "secondary" | "danger";
+
+  variant?: "primary" | "secondary" | "ghost";
+
 };
 
+
+
 export default function AppButton({
+
   title,
+
   onPress,
-  variant = "primary",
+
+  variant = "primary"
+
 }: Props) {
+
+
   return (
-    <Pressable
-      style={({ pressed }) => [
+
+    <TouchableOpacity
+
+      style={[
         styles.button,
-        styles[variant],
-        pressed && styles.pressed,
+
+        variant === "secondary" &&
+        styles.secondary,
+
+        variant === "ghost" &&
+        styles.ghost,
+
       ]}
+
+
       onPress={onPress}
+
     >
-      <Text style={styles.text}>{title}</Text>
-    </Pressable>
+
+
+      <Text
+
+        style={[
+          styles.text,
+
+          variant === "secondary" &&
+          styles.secondaryText,
+
+
+          variant === "ghost" &&
+          styles.ghostText,
+
+        ]}
+
+      >
+
+        {title}
+
+      </Text>
+
+
+    </TouchableOpacity>
+
   );
+
 }
