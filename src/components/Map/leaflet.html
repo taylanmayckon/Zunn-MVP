@@ -30,10 +30,29 @@
                 transform: scale(0.2);
                 opacity: 0;
             }
-
             to {
                 transform: scale(1);
                 opacity: 1;
+            }
+        }
+
+        /* Animação de respiração suave para o círculo de raio da estação */
+        .circle-active-pulse {
+            animation: circleBreathe 2.5s infinite ease-in-out;
+        }
+
+        @keyframes circleBreathe {
+            0% {
+                fill-opacity: 0.08;
+                stroke-opacity: 0.3;
+            }
+            50% {
+                fill-opacity: 0.18;
+                stroke-opacity: 0.7;
+            }
+            100% {
+                fill-opacity: 0.08;
+                stroke-opacity: 0.3;
             }
         }
     </style>
@@ -58,7 +77,6 @@ L.tileLayer(
 ).addTo(map);
 
 
-
 const stationMarkers = [];
 const stationCircles = [];
 const movingScooterMarkers = [];
@@ -67,446 +85,284 @@ const stationScooterMarkers = [];
 let expandedStation = null;
 
 
-
 function clearMarkers(list) {
-
     list.forEach(marker => {
-
         map.removeLayer(marker);
-
     });
-
     list.length = 0;
-
 }
 
 
-
 function createScooterIcon(selected, battery) {
-
     return L.divIcon({
-
         className: "custom-marker",
-
         html:
-
         '<div style="display:flex;flex-direction:column;align-items:center;transform:scale(' +
         (selected ? 1.25 : 1) +
         ');transition:transform 0.2s;">' +
-
         '<div style="background:' +
         (selected ? "#ffffff" : "#27272a") +
         ';color:' +
         (selected ? "#09090b" : "#A3E635") +
         ';padding:3px 8px;border-radius:12px;font-size:11px;font-weight:bold;margin-bottom:4px;border:1px solid rgba(163,230,53,0.4);box-shadow:0 4px 8px rgba(0,0,0,0.3);white-space:nowrap;">' +
-
         '🔋 ' + battery + '%' +
-
         '</div>' +
-
         '<div style="width:38px;height:38px;border-radius:50%;background:' +
         (selected ? "#A3E635" : "#18181b") +
         ';border:2px solid ' +
         (selected ? "#ffffff" : "#A3E635") +
         ';display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(163,230,53,0.5);">' +
-
         '<span style="color:' +
         (selected ? "#09090b" : "#A3E635") +
         ';font-size:18px;">⚡</span>' +
-
         '</div>' +
-
         '</div>',
-
         iconSize:[50,70],
-
         iconAnchor:[25,70]
-
     });
-
 }
-
 
 
 function sendScooterMessage(scooter){
-
     if(window.ReactNativeWebView){
-
         window.ReactNativeWebView.postMessage(
-
             JSON.stringify({
-
                 type:"scooter",
-
                 scooter
-
             })
-
         );
-
     }
-
 }
 
 
-
 function createScooterMarker(scooter){
-
     const marker = L.marker(
-
         [
             scooter.latitude,
             scooter.longitude
         ],
-
         {
-
             icon:createScooterIcon(
-
                 window.selectedScooter === scooter.id,
-
                 scooter.battery
-
             )
-
         }
-
     );
 
-
     marker.on("click",()=>{
-
         sendScooterMessage(scooter);
-
     });
 
-
     return marker;
-
 }
-
 
 
 function createExpandedScooterMarker(scooter){
-
     return createScooterMarker(scooter);
-
 }
 
 
-
-function createStationIcon(station){
-
+function createStationIcon(station, isExpanded){
     return L.divIcon({
-
         className:"",
-
         html:`
-
         <div style="display:flex;flex-direction:column;align-items:center;">
-
-            <div style="background:#A3E635;color:#09090b;padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 4px 10px rgba(0,0,0,.35);">
-
+            <div style="background:${isExpanded ? '#84CC16' : '#A3E635'}; color:#09090b; padding:5px 12px; border-radius:999px; font-weight:700; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,.35); transition: background 0.3s;">
                 🛴 ${station.availableScooters}
-
             </div>
-
-
-            <div style="margin-top:5px;color:white;font-size:11px;text-align:center;text-shadow:0 2px 5px black;max-width:100px;">
-
+            <div style="margin-top:5px; color:white; font-size:11px; text-align:center; text-shadow:0 2px 5px black; max-width:100px;">
                 ${station.name}
-
             </div>
-
         </div>
-
         `,
-
         iconSize:[110,70],
-
         iconAnchor:[55,35]
-
     });
-
 }
-
 
 
 function renderStations(){
-
     clearMarkers(stationMarkers);
 
-
     stationCircles.forEach(circle=>{
-
         map.removeLayer(circle);
-
     });
-
-
     stationCircles.length=0;
 
-
-
     if(!window.stations)
-
         return;
 
-
-
     window.stations.forEach(station=>{
-
+        const isCurrentExpanded = expandedStation === station.id;
 
         const circle=L.circle(
-
             [
                 station.latitude,
                 station.longitude
             ],
-
             {
-
                 radius:45,
-
                 color:"#A3E635",
-
                 fillColor:"#65A30D",
-
-                fillOpacity:0.25,
-
-                weight:2
-
+                fillOpacity: isCurrentExpanded ? 0.12 : 0.25,
+                weight: isCurrentExpanded ? 1.5 : 2
             }
-
         );
-
 
         circle.addTo(map);
-
         stationCircles.push(circle);
+        station.circleRef = circle;
 
-
+        if (isCurrentExpanded && circle._path) {
+            circle._path.classList.add("circle-active-pulse");
+        }
 
         const marker=L.marker(
-
             [
                 station.latitude,
                 station.longitude
             ],
-
             {
-
-                icon:createStationIcon(station)
-
+                icon:createStationIcon(station, isCurrentExpanded)
             }
-
         );
-
 
         marker.addTo(map);
 
-
-
         marker.on("click",()=>{
-
             if(expandedStation===station.id){
-
                 collapseStations();
-
             }
-
             else{
-
                 expandStation(station);
-
             }
-
         });
 
-
-
         stationMarkers.push(marker);
-
-
+        station.markerRef = marker;
     });
-
 }
-
-
 
 
 function renderMovingScooters(){
-
     clearMarkers(movingScooterMarkers);
 
-
     if(!window.scooters)
-
         return;
 
-
-
     window.scooters.forEach(scooter=>{
-
-
         const marker=createScooterMarker(scooter);
-
-
         marker.addTo(map);
-
-
         movingScooterMarkers.push(marker);
-
-
     });
-
 }
 
 
-
-
-
 function expandStation(station){
-
     collapseStations();
-
 
     expandedStation=station.id;
 
+    if (station.markerRef) {
+        station.markerRef.setIcon(createStationIcon(station, true));
+    }
+
+    if (station.circleRef) {
+        station.circleRef.setStyle({
+            fillOpacity: 0.12,
+            weight: 1.5
+        });
+        if (station.circleRef._path) {
+            station.circleRef._path.classList.add("circle-active-pulse");
+        }
+    }
 
     const stationScooters=(window.allScooters || [])
-
         .filter(
-
             scooter=>scooter.stationId===station.id
-
         );
 
-
-
     stationScooters.forEach((scooter,index)=>{
-
-
         const angle=(index/stationScooters.length)*Math.PI*2;
-
-
         const radius=0.00030;
 
-
-
         const expandedScooter={
-
             ...scooter,
-
             latitude:
-
                 station.latitude+
-
                 Math.cos(angle)*radius,
-
-
             longitude:
-
                 station.longitude+
-
                 Math.sin(angle)*radius
-
         };
 
-
-
         const marker=createExpandedScooterMarker(expandedScooter);
-
-
         marker.addTo(map);
-
-
-
         stationScooterMarkers.push(marker);
-
-
     });
-
 }
 
 
 function collapseStations(){
+    if (expandedStation && window.stations) {
+        const prevStation = window.stations.find(item => item.id === expandedStation);
+        if (prevStation) {
+            if (prevStation.markerRef) {
+                prevStation.markerRef.setIcon(createStationIcon(prevStation, false));
+            }
+            if (prevStation.circleRef) {
+                prevStation.circleRef.setStyle({
+                    color: "#A3E635",
+                    fillColor: "#65A30D",
+                    fillOpacity: 0.25,
+                    weight: 2
+                });
+                if (prevStation.circleRef._path) {
+                    prevStation.circleRef._path.classList.remove("circle-active-pulse");
+                }
+            }
+        }
+    }
 
     clearMarkers(stationScooterMarkers);
-
     expandedStation=null;
-
 }
-
-
-
-window.renderStations=renderStations;
-
-window.renderMovingScooters=renderMovingScooters;
-
 
 
 function initializeMapData(){
-
     if(window.stations && window.allScooters){
-
         renderStations();
-
         renderMovingScooters();
-
     }
-
 }
-
-
 
 window.initializeMapData = initializeMapData;
 
 
-
 map.on("click",()=>{
-
     collapseStations();
-
 });
 
 
-
 window.updateSelectedScooter=function(id){
-
     window.selectedScooter=id;
 
-
     clearMarkers(movingScooterMarkers);
-
     clearMarkers(stationScooterMarkers);
-
 
     renderMovingScooters();
 
-
-
     if(expandedStation){
-
         const station=
-
             window.stations.find(
-
                 item=>item.id===expandedStation
-
             );
 
-
         if(station){
-
             expandStation(station);
-
         }
-
     }
-
 };
-
 
 </script>
 
