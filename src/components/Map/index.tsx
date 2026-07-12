@@ -23,6 +23,7 @@ export default function Map({
     <View style={styles.container}>
 
       <WebView
+        key={selectedId ?? "none"}
         style={styles.map}
 
         originWhitelist={["*"]}

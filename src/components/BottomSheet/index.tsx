@@ -1,68 +1,219 @@
-import { View, Text } from "react-native";
+import {
+  View,
+  Text,
+  Animated,
+} from "react-native";
+
+import {
+  useEffect,
+  useRef,
+} from "react";
 
 import styles from "./styles";
 
 import AppButton from "@/components/AppButton";
 
-import { Colors } from "@/constants";
-
 import type { Scooter } from "@/types";
+
 
 type Props = {
   scooter: Scooter | null;
+  onCancel: () => void;
 };
 
-export default function BottomSheet({ scooter }: Props) {
-  // Nenhum patinete selecionado
-  if (!scooter) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.handle} />
 
-        <Text style={styles.title}>
-          Encontre um Zunn
-        </Text>
 
-        <Text style={styles.subtitle}>
-          Selecione um patinete no mapa ou escaneie um QR Code.
-        </Text>
+export default function BottomSheet({
+  scooter,
+  onCancel
+}: Props) {
 
-        <AppButton
-          title="Escanear QR Code"
-          onPress={() => {}}
-        />
-      </View>
-    );
-  }
 
-  // Patinete selecionado
+  const height = useRef(
+    new Animated.Value(220)
+  ).current;
+
+
+
+  useEffect(() => {
+
+
+    Animated.spring(
+      height,
+      {
+        toValue: scooter ? 360 : 220,
+
+        friction: 8,
+
+        tension: 40,
+
+        useNativeDriver:false,
+      }
+
+    ).start();
+
+
+  },[scooter]);
+
+
+
+
   return (
-    <View style={styles.container}>
-      <View style={styles.handle} />
 
-      <Text style={styles.title}>
-        {scooter.id}
-      </Text>
+    <Animated.View
 
-      <Text style={styles.subtitle}>
-        {scooter.location}
-      </Text>
+      style={[
+        styles.container,
 
-      <Text
-        style={{
-          color: Colors.primary,
-          fontWeight: "700",
-          fontSize: 18,
-          marginBottom: 20,
-        }}
-      >
-        🔋 {scooter.battery}%
-      </Text>
+        {
+          height
+        }
 
-      <AppButton
-        title="Escanear para Desbloquear"
-        onPress={() => {}}
-      />
-    </View>
+      ]}
+
+    >
+
+
+      <View style={styles.handle}/>
+
+
+
+      {
+        !scooter ? (
+
+          <>
+
+            <Text style={styles.title}>
+              Encontre um Zunn
+            </Text>
+
+
+            <Text style={styles.subtitle}>
+              Selecione um patinete no mapa ou escaneie um QR Code.
+            </Text>
+
+
+
+            <AppButton
+              title="Escanear QR Code"
+              onPress={()=>{}}
+            />
+
+          </>
+
+
+        ) : (
+
+
+          <>
+
+
+            <View style={styles.header}>
+
+
+              <View>
+
+                <Text style={styles.title}>
+                  {scooter.id}
+                </Text>
+
+
+                <Text style={styles.subtitle}>
+                  {scooter.location}
+                </Text>
+
+
+              </View>
+
+
+
+              <View style={styles.battery}>
+
+
+                <Text style={styles.batteryText}>
+                  🔋 {scooter.battery}%
+                </Text>
+
+
+              </View>
+
+
+            </View>
+
+
+
+
+
+            <View style={styles.infoContainer}>
+
+
+              <View style={styles.infoCard}>
+
+                <Text style={styles.infoLabel}>
+                  Desbloqueio
+                </Text>
+
+
+                <Text style={styles.infoValue}>
+                  R$ 2,50
+                </Text>
+
+
+              </View>
+
+
+
+
+
+              <View style={styles.infoCard}>
+
+                <Text style={styles.infoLabel}>
+                  Por minuto
+                </Text>
+
+
+                <Text style={styles.infoValue}>
+                  R$ 0,60
+                </Text>
+
+
+              </View>
+
+
+
+            </View>
+
+
+
+
+            <AppButton
+
+              title="Cancelar"
+
+              onPress={onCancel}
+
+            />
+
+
+            <AppButton
+
+              title="Escanear para Desbloquear"
+
+              onPress={()=>{}}
+
+            />
+
+
+
+          </>
+
+
+        )
+      }
+
+
+    </Animated.View>
+
+
   );
 }

@@ -37,6 +37,7 @@ export default function HomeScreen() {
 
       <BottomSheet
         scooter={selectedScooter}
+        onCancel={() => setSelectedScooter(null)}
       />
 
       <DrawerMenu

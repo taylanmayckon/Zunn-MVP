@@ -1,66 +1,204 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "@/constants";
+import {
+  StyleSheet
+} from "react-native";
+
 
 export default StyleSheet.create({
-  container: {
-    position: "absolute",
 
-    bottom: 0,
+container:{
 
-    left: 0,
 
-    right: 0,
+  position:"absolute",
 
-    backgroundColor: Colors.surface,
 
-    borderTopLeftRadius: 28,
+  bottom:0,
 
-    borderTopRightRadius: 28,
 
-    padding: 24,
+  width:"100%",
 
-    paddingBottom: 36,
 
-    minHeight: 240,
+  backgroundColor:"#18181B",
 
-    shadowColor: "#000",
 
-    shadowOffset: {
-      width: 0,
-      height: -5,
-    },
+  borderTopLeftRadius:30,
 
-    shadowOpacity: 0.3,
+  borderTopRightRadius:30,
 
-    shadowRadius: 12,
 
-    elevation: 15,
-  },
+  padding:24,
 
-  handle: {
-    width: 50,
 
-    height: 5,
+  borderTopWidth:1,
 
-    borderRadius: 5,
+  borderColor:"#27272A",
 
-    backgroundColor: Colors.border,
 
-    alignSelf: "center",
+},
 
-    marginBottom: 20,
-  },
 
-  title: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "700",
-  },
 
-  subtitle: {
-    color: "#A1A1AA",
-    marginTop: 6,
-    marginBottom: 20,
-  },
+handle:{
+
+
+  width:45,
+
+  height:5,
+
+
+  backgroundColor:"#3F3F46",
+
+
+  borderRadius:10,
+
+
+  alignSelf:"center",
+
+
+  marginBottom:25,
+
+
+},
+
+
+
+title:{
+
+
+  color:"white",
+
+
+  fontSize:24,
+
+
+  fontWeight:"700",
+
+
+},
+
+
+
+subtitle:{
+
+
+  color:"#A1A1AA",
+
+
+  marginTop:6,
+
+
+  marginBottom:20,
+
+
+},
+
+
+
+header:{
+
+
+  flexDirection:"row",
+
+  justifyContent:"space-between",
+
+  alignItems:"center",
+
+
+},
+
+
+
+battery:{
+
+
+  backgroundColor:"#27272A",
+
+  paddingHorizontal:12,
+
+  paddingVertical:8,
+
+  borderRadius:20,
+
+
+},
+
+
+
+batteryText:{
+
+
+  color:"#A3E635",
+
+
+  fontWeight:"700",
+
+
+},
+
+
+
+infoContainer:{
+
+
+  flexDirection:"row",
+
+  gap:12,
+
+  marginBottom:20,
+
+
+},
+
+
+
+infoCard:{
+
+
+  flex:1,
+
+
+  backgroundColor:"#09090B",
+
+
+  padding:14,
+
+
+  borderRadius:18,
+
+
+  borderWidth:1,
+
+  borderColor:"#27272A",
+
+
+},
+
+
+
+infoLabel:{
+
+
+  color:"#71717A",
+
+  fontSize:12,
+
+
+},
+
+
+
+infoValue:{
+
+
+  color:"white",
+
+  fontSize:18,
+
+  fontWeight:"700",
+
+  marginTop:5,
+
+
+},
+
+
 });
-
