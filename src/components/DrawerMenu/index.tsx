@@ -1,24 +1,6 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  ScrollView,
-} from "react-native";
-
+import { View, Text, TouchableOpacity, Animated, ScrollView } from "react-native";
 import { useEffect, useRef } from "react";
-
-import {
-  MapPin,
-  Wallet,
-  X,
-  Clock,
-  CreditCard,
-  HelpCircle,
-  Settings,
-  ChevronRight,
-} from "lucide-react-native";
-
+import { MapPin, Wallet, X, Clock, CreditCard, HelpCircle, Settings, ChevronRight, Star } from "lucide-react-native";
 import { router } from "expo-router";
 import styles from "./styles";
 
@@ -34,52 +16,21 @@ export default function DrawerMenu({ visible, onClose }: Props) {
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.spring(translateX, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
+        Animated.spring(translateX, { toValue: 0, friction: 8, tension: 40, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
       ]).start();
     } else {
       Animated.parallel([
-        Animated.timing(translateX, {
-          toValue: -300,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
+        Animated.timing(translateX, { toValue: -300, duration: 200, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
       ]).start();
     }
   }, [visible]);
 
   return (
-    <Animated.View
-      style={[
-        styles.overlay,
-        {
-          opacity,
-          pointerEvents: visible ? "auto" : "none",
-        },
-      ]}
-    >
-      <Animated.View
-        style={[
-          styles.container,
-          {
-            transform: [{ translateX }],
-          },
-        ]}
-      >
+    <Animated.View style={[styles.overlay, { opacity, pointerEvents: visible ? "auto" : "none" }]}>
+      <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
+        
         <TouchableOpacity style={styles.close} onPress={onClose}>
           <X size={26} color="white" />
         </TouchableOpacity>
@@ -94,15 +45,19 @@ export default function DrawerMenu({ visible, onClose }: Props) {
           </View>
         </View>
 
+        {/* --- BANNER DE MONETIZAÇÃO ZUNN PRO --- */}
+        <TouchableOpacity style={styles.promoBanner} activeOpacity={0.8}>
+          <View style={styles.promoIcon}>
+            <Star size={20} color="#09090b" fill="#09090b" />
+          </View>
+          <View style={styles.promoTextContainer}>
+            <Text style={styles.promoTitle}>Zunn Pro</Text>
+            <Text style={styles.promoSubtitle}>Desbloqueios grátis por R$ 12,90/mês</Text>
+          </View>
+        </TouchableOpacity>
+
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-          {/* ITENS ATIVOS */}
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => {
-              onClose();
-              router.push("/");
-            }}
-          >
+          <TouchableOpacity style={styles.item} onPress={() => { onClose(); router.push("/"); }}>
             <View style={styles.itemLeft}>
               <MapPin size={24} color="#A3E635" />
               <Text style={styles.itemText}>Mapa</Text>
@@ -110,13 +65,7 @@ export default function DrawerMenu({ visible, onClose }: Props) {
             <ChevronRight size={20} color="#3F3F46" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => {
-              onClose();
-              router.push("/wallet");
-            }}
-          >
+          <TouchableOpacity style={styles.item} onPress={() => { onClose(); router.push("/wallet"); }}>
             <View style={styles.itemLeft}>
               <Wallet size={24} color="#A3E635" />
               <Text style={styles.itemText}>Carteira</Text>
@@ -124,31 +73,26 @@ export default function DrawerMenu({ visible, onClose }: Props) {
             <ChevronRight size={20} color="#3F3F46" />
           </TouchableOpacity>
 
-          {/* DIVISOR */}
           <View style={styles.divider} />
 
-          {/* ITENS VISUAIS (MOCK) */}
           <View style={styles.itemMock}>
             <View style={styles.itemLeft}>
               <Clock size={24} color="#A1A1AA" />
               <Text style={styles.itemTextMock}>Histórico de Corridas</Text>
             </View>
           </View>
-
           <View style={styles.itemMock}>
             <View style={styles.itemLeft}>
               <CreditCard size={24} color="#A1A1AA" />
               <Text style={styles.itemTextMock}>Pagamento</Text>
             </View>
           </View>
-
           <View style={styles.itemMock}>
             <View style={styles.itemLeft}>
               <HelpCircle size={24} color="#A1A1AA" />
               <Text style={styles.itemTextMock}>Central de Ajuda</Text>
             </View>
           </View>
-
           <View style={styles.itemMock}>
             <View style={styles.itemLeft}>
               <Settings size={24} color="#A1A1AA" />
@@ -157,7 +101,6 @@ export default function DrawerMenu({ visible, onClose }: Props) {
           </View>
         </ScrollView>
 
-        {/* SAIR (Fixo no rodapé) */}
         <TouchableOpacity style={styles.logout} onPress={onClose}>
           <Text style={styles.logoutText}>Sair da conta</Text>
         </TouchableOpacity>

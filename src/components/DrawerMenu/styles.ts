@@ -106,4 +106,39 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+
+  // BANNER DE MONETIZAÇÃO ZUNN PRO
+  promoBanner: {
+    backgroundColor: "rgba(163, 230, 53, 0.12)", // Fundo verde transparente
+    borderWidth: 1,
+    borderColor: "rgba(163, 230, 53, 0.3)",
+    borderRadius: 20,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginBottom: 32, // Empurra os outros itens para baixo
+  },
+  promoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#A3E635",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  promoTextContainer: {
+    flex: 1,
+  },
+  promoTitle: {
+    color: "#A3E635",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  promoSubtitle: {
+    color: "#D4D4D8",
+    fontSize: 13,
+    marginTop: 3,
+    lineHeight: 18,
+  },
 });
