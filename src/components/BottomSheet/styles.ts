@@ -33,7 +33,12 @@ export default StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start", // Alterado para acomodar os dois textos
+  },
+  
+  // --- NOVAS CLASSES DE BATERIA ---
+  batteryBlock: {
+    alignItems: "flex-end",
   },
   battery: {
     backgroundColor: "#27272A",
@@ -45,6 +50,14 @@ export default StyleSheet.create({
     color: "#A3E635",
     fontWeight: "700",
   },
+  rangeText: {
+    color: "#71717A",
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 6,
+  },
+  // --------------------------------
+
   infoContainer: {
     flexDirection: "row",
     gap: 12,
@@ -67,5 +80,23 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginTop: 5,
+  },
+
+  // --- NOVAS CLASSES DE BOTÕES SECUNDÁRIOS ---
+  secondaryActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6, // Dá um respiro pequeno em relação ao botão de desbloqueio
+    gap: 12,
+  },
+  bellButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#27272A",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#3F3F46",
   },
 });
