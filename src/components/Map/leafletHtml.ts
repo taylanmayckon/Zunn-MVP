@@ -99,7 +99,6 @@ let destinationPin = null;
 // e a rota de corrida ativa (verde). Ambas usam o MESMO caminho em zigue-zague.
 const mockRouteCoords = [
     userLocation,
-    [-9.394, -40.500],
     [-9.392889, -40.496006],
     [-9.394727, -40.496358],
     [-9.394767, -40.496519],
