@@ -158,7 +158,7 @@ window.togglePlannedRoute = function(isActive) {
             }).addTo(map);
 
             destinationPin = L.marker(destinationCoords, {
-                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
+                icon: L.divIcon({ className: 'destination-marker', html: '', iconSize: [30, 30], iconAnchor: [15, 30] })
             }).addTo(map);
 
             map.flyToBounds(plannedRouteLine.getBounds(), { padding: [80, 80], animate: true, duration: 1.2 });
@@ -197,7 +197,7 @@ window.toggleRideRoute = function(isActive) {
 
             // Adiciona o pino de destino novamente (para visualização durante a corrida)
             destinationPin = L.marker(mockRouteCoords[mockRouteCoords.length - 1], {
-                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
+                icon: L.divIcon({ className: 'destination-marker', html: '', iconSize: [30, 30], iconAnchor: [15, 30] })
             }).addTo(map);
 
             // Dá um zoom mais próximo no usuário (estilo navegação curva a curva)

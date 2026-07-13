@@ -11,7 +11,8 @@ type Props = {
   onSelectScooter?: (scooter: Scooter) => void;
   selectedScooter?: Scooter | null;
   centerTrigger?: number; 
-  isRoutePlanned?: boolean; // <- Nova prop que controla o desenho do planejamento
+  isRoutePlanned?: boolean;
+  rideActive?: boolean; // <-- 1. RECUPERAMOS A VARIÁVEL AQUI
 };
 
 export default function Map({
@@ -19,6 +20,7 @@ export default function Map({
   selectedScooter,
   centerTrigger = 0,
   isRoutePlanned = false,
+  rideActive = false, // <-- 2. ADICIONAMOS AQUI
 }: Props) {
   const webViewRef = useRef<WebView>(null);
   const selectedId = selectedScooter?.id ?? null;
@@ -45,7 +47,7 @@ export default function Map({
     }
   }, [centerTrigger]);
 
-  // NOVO: Dispara a linha de planejamento opcional
+  // Dispara a linha azul de planejamento
   useEffect(() => {
     if (webViewRef.current && isRoutePlanned !== undefined) {
       webViewRef.current.injectJavaScript(`
@@ -56,6 +58,18 @@ export default function Map({
       `);
     }
   }, [isRoutePlanned]);
+
+  // <-- 3. NOVO: Dispara a linha VERDE de corrida ativa -->
+  useEffect(() => {
+    if (webViewRef.current && rideActive !== undefined) {
+      webViewRef.current.injectJavaScript(`
+        if (typeof window.toggleRideRoute === 'function') {
+          window.toggleRideRoute(${rideActive});
+        }
+        true;
+      `);
+    }
+  }, [rideActive]);
 
   return (
     <View style={styles.container}>
@@ -77,6 +91,11 @@ export default function Map({
           
           if (typeof window.togglePlannedRoute === 'function') {
             window.togglePlannedRoute(${isRoutePlanned});
+          }
+
+          // Garante que o mapa desenhe a rota verde se a tela recarregar na corrida
+          if (typeof window.toggleRideRoute === 'function') {
+            window.toggleRideRoute(${rideActive});
           }
           
           true;

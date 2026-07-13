@@ -47,6 +47,7 @@ export default function HomeScreen() {
         selectedScooter={selectedScooter}
         centerTrigger={centerMapTrigger}
         isRoutePlanned={isRoutePlanned} // <- Envia para o mapa desenhar
+        rideActive={rideActive}
       />
 
       {!drawerOpen && (
