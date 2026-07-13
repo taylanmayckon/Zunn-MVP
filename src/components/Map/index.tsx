@@ -11,14 +11,14 @@ type Props = {
   onSelectScooter?: (scooter: Scooter) => void;
   selectedScooter?: Scooter | null;
   centerTrigger?: number; 
-  rideActive?: boolean;
+  isRoutePlanned?: boolean; // <- Nova prop que controla o desenho do planejamento
 };
 
 export default function Map({
   onSelectScooter,
   selectedScooter,
   centerTrigger = 0,
-  rideActive = false,
+  isRoutePlanned = false,
 }: Props) {
   const webViewRef = useRef<WebView>(null);
   const selectedId = selectedScooter?.id ?? null;
@@ -45,17 +45,17 @@ export default function Map({
     }
   }, [centerTrigger]);
 
-  // Mantemos o useEffect para atualizações de estado quando o componente já está vivo
+  // NOVO: Dispara a linha de planejamento opcional
   useEffect(() => {
-    if (webViewRef.current && rideActive !== undefined) {
+    if (webViewRef.current && isRoutePlanned !== undefined) {
       webViewRef.current.injectJavaScript(`
-        if (typeof window.toggleRideRoute === 'function') {
-          window.toggleRideRoute(${rideActive});
+        if (typeof window.togglePlannedRoute === 'function') {
+          window.togglePlannedRoute(${isRoutePlanned});
         }
         true;
       `);
     }
-  }, [rideActive]);
+  }, [isRoutePlanned]);
 
   return (
     <View style={styles.container}>
@@ -75,9 +75,8 @@ export default function Map({
           window.renderStations();
           window.renderMovingScooters();
           
-          /* CORREÇÃO AQUI: Força o mapa a verificar se deve desenhar a rota assim que nascer */
-          if (typeof window.toggleRideRoute === 'function') {
-            window.toggleRideRoute(${rideActive});
+          if (typeof window.togglePlannedRoute === 'function') {
+            window.togglePlannedRoute(${isRoutePlanned});
           }
           
           true;

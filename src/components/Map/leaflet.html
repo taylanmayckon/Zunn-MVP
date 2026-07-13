@@ -57,7 +57,13 @@
         .zoom-high .scooter-container:not(.selected) { transform: scale(1.1); }
         .zoom-high .station-container { transform: scale(1.1); }
 
-        /* --- CSS DA ROTA BRILHANTE (NOVO) --- */
+        /* --- CSS DO DESTINO MOCKADO E ROTA BRILHANTE --- */
+        .destination-marker {
+            font-size: 28px;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));
+            text-align: center;
+        }
+        
         .ride-route-glow {
             filter: drop-shadow(0 0 8px rgba(163, 230, 53, 0.8));
         }
@@ -68,7 +74,8 @@
 <div id="map"></div>
 
 <script>
-const userLocation = [-9.3950, -40.4985]; // Coordenada central do Usuário
+
+const userLocation = [-9.392412, -40.495726]; 
 const map = L.map("map", { zoomControl: false }).setView(userLocation, 16);
 
 L.tileLayer(
@@ -81,28 +88,33 @@ const stationMarkers = [];
 const stationCircles = [];
 const movingScooterMarkers = [];
 const stationScooterMarkers = [];
-let ridePolyline = null; // Variável para segurar o trajeto
+
+// Variáveis para as rotas e pinos
+let plannedRouteLine = null;
+let activeRideLine = null;
+let destinationPin = null;
+
+// Waypoints mockados compartilhados entre a rota de planejamento (azul)
+// e a rota de corrida ativa (verde). Ambas usam o MESMO caminho em zigue-zague.
+const mockRouteCoords = [
+    userLocation,
+    [-9.392889, -40.496006],
+    [-9.394727, -40.496358],
+    [-9.394767, -40.496519],
+    [-9.391172, -40.501417],
+    [-9.390116, -40.500698],
+    [-9.387883, -40.500858] // Chegada no Parque Municipal
+];
 
 // ==========================================
 // 1. GEOFENCING: ZONAS DE INTELIGÊNCIA URBANA
 // ==========================================
 const forbiddenZonePoints = [
-    [-9.401960, -40.515036],
-    [-9.415912, -40.540351],
-    [-9.388984, -40.559921],
-    [-9.375605, -40.553913],
-    [-9.356211, -40.548076],
-    [-9.350717, -40.509367],
-    [-9.346737, -40.472889],
-    [-9.363397, -40.444931],
-    [-9.393968, -40.451969],
-    [-9.406119, -40.469178],
-    [-9.390961, -40.472697],
-    [-9.388208, -40.476684],
-    [-9.388208, -40.476684],
-    [-9.373831, -40.488103],
-    [-9.378663, -40.507179],
-    [-9.380478, -40.511234],
+    [-9.401960, -40.515036], [-9.415912, -40.540351], [-9.388984, -40.559921],
+    [-9.375605, -40.553913], [-9.356211, -40.548076], [-9.350717, -40.509367],
+    [-9.346737, -40.472889], [-9.363397, -40.444931], [-9.393968, -40.451969],
+    [-9.406119, -40.469178], [-9.390961, -40.472697], [-9.388208, -40.476684],
+    [-9.373831, -40.488103], [-9.378663, -40.507179], [-9.380478, -40.511234],
     [-9.387200, -40.524784],
 ];
 L.polygon(forbiddenZonePoints, {
@@ -128,36 +140,81 @@ window.centerOnUser = function() {
 };
 
 // ==========================================
-// 3. DESENHO DO TRAJETO AO VIVO (NOVO)
+// 3. DESENHO DO PLANEJAMENTO DE ROTA (AZUL)
+// ==========================================
+window.togglePlannedRoute = function(isActive) {
+    if (isActive) {
+        if (!plannedRouteLine) {
+            const destinationCoords = mockRouteCoords[mockRouteCoords.length - 1];
+
+            // Usa TODOS os waypoints (mockRouteCoords), não só o destino,
+            // para desenhar a rota em múltiplos segmentos.
+            plannedRouteLine = L.polyline(mockRouteCoords, {
+                color: '#3B82F6', 
+                weight: 4,
+                dashArray: '10, 12',
+                lineCap: 'round',
+                lineJoin: 'round'
+            }).addTo(map);
+
+            destinationPin = L.marker(destinationCoords, {
+                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
+            }).addTo(map);
+
+            map.flyToBounds(plannedRouteLine.getBounds(), { padding: [80, 80], animate: true, duration: 1.2 });
+        }
+    } else {
+        if (plannedRouteLine) map.removeLayer(plannedRouteLine);
+        if (destinationPin) map.removeLayer(destinationPin);
+        plannedRouteLine = null;
+        destinationPin = null;
+        
+        window.centerOnUser(); 
+    }
+};
+
+// ==========================================
+// 4. COMPORTAMENTO DA CORRIDA AO VIVO (VERDE)
 // ==========================================
 window.toggleRideRoute = function(isActive) {
     if (isActive) {
-        if (!ridePolyline) {
-            // Desenha o caminho falso que culmina onde o usuário está agora
-            const routeCoords = [
-                [-9.3910, -40.5040], // O patinete começou lá longe...
-                [-9.3920, -40.5015], // ...desceu a rua...
-                [-9.3940, -40.5005], // ...fez a curva...
-                userLocation         // ...e chegou aqui!
-            ];
+        if (!activeRideLine) {
+            // Remove a rota de planejamento (azul) se existir para dar lugar à verde
+            if (plannedRouteLine) map.removeLayer(plannedRouteLine);
+            if (destinationPin) map.removeLayer(destinationPin);
+            plannedRouteLine = null;
+            destinationPin = null;
 
-            ridePolyline = L.polyline(routeCoords, {
-                color: '#A3E635', // Verde neon
-                weight: 5,
+            // Cria a linha sólida Verde Neon com efeito de "Glow",
+            // reaproveitando o mesmo array de waypoints (mockRouteCoords)
+            activeRideLine = L.polyline(mockRouteCoords, {
+                color: '#A3E635', 
+                weight: 6,
                 lineCap: 'round',
                 lineJoin: 'round',
-                className: 'ride-route-glow' // O brilho no mapa
+                className: 'ride-route-glow' 
             }).addTo(map);
 
-            // Ajusta a câmera de forma cinematográfica para ver o trajeto inteiro
-            map.flyToBounds(ridePolyline.getBounds(), { padding: [60, 60], animate: true, duration: 1.2 });
+            // Adiciona o pino de destino novamente (para visualização durante a corrida)
+            destinationPin = L.marker(mockRouteCoords[mockRouteCoords.length - 1], {
+                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
+            }).addTo(map);
+
+            // Dá um zoom mais próximo no usuário (estilo navegação curva a curva)
+            map.flyTo(userLocation, 17, { animate: true, duration: 1.5 });
         }
     } else {
-        if (ridePolyline) {
-            map.removeLayer(ridePolyline); // Apaga a linha
-            ridePolyline = null;
-            window.centerOnUser(); // Volta pro usuário
+        // Quando clicar em "Encerrar", a linha verde neon some
+        if (activeRideLine) {
+            map.removeLayer(activeRideLine);
+            activeRideLine = null;
         }
+        if (destinationPin) {
+            map.removeLayer(destinationPin);
+            destinationPin = null;
+        }
+        // A câmera se afasta devolvendo a visão geral da cidade
+        map.flyTo(userLocation, 16, { animate: true, duration: 1.0 });
     }
 };
 

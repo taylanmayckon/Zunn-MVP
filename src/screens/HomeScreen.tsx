@@ -2,7 +2,6 @@ import { View, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 
-// Importe o ícone LocateFixed
 import { LocateFixed } from "lucide-react-native";
 
 import Header from "@/components/Header";
@@ -20,40 +19,40 @@ export default function HomeScreen() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [rideActive, setRideActive] = useState(false);
   
-  // Estado que funciona como um "gatilho" para focar a câmera no GPS
+  // NOVO: Estado que controla o planejamento opcional de viagem
+  const [isRoutePlanned, setIsRoutePlanned] = useState(false);
+  
   const [centerMapTrigger, setCenterMapTrigger] = useState(0);
 
   useEffect(() => {
     if (params.startRide === "true") {
       setRideActive(true);
+      setIsRoutePlanned(false); // Desliga a rota de planejamento quando a corrida real começa
     }
   }, [params]);
 
-  // Cálculo dinâmico para o botão Flutuante (FAB) não ficar escondido
   const getFabBottomPosition = () => {
     if (rideActive) return 360; 
-    if (selectedScooter) return 380; // Acima do bottomsheet expandido
-    return 240; // Acima do bottomsheet minimizado
+    if (selectedScooter) return 460; // Ajuste leve para o novo botão do bottomsheet
+    return 240; 
   };
 
   return (
     <View style={{ flex: 1 }}>
       <Map
-        onSelectScooter={setSelectedScooter}
+        onSelectScooter={(scooter) => {
+            setSelectedScooter(scooter);
+            setIsRoutePlanned(false); // Reseta a rota ao clicar em outro patinete
+        }}
         selectedScooter={selectedScooter}
         centerTrigger={centerMapTrigger}
-        rideActive={rideActive}
+        isRoutePlanned={isRoutePlanned} // <- Envia para o mapa desenhar
       />
 
       {!drawerOpen && (
-        <Header
-          onMenuPress={() => {
-            setDrawerOpen(true);
-          }}
-        />
+        <Header onMenuPress={() => setDrawerOpen(true)} />
       )}
 
-      {/* BOTÃO FLUTUANTE DE LOCALIZAÇÃO (FAB) */}
       {!drawerOpen && (
         <TouchableOpacity
           activeOpacity={0.8}
@@ -93,18 +92,16 @@ export default function HomeScreen() {
       ) : (
         <BottomSheet
           scooter={selectedScooter}
+          isRoutePlanned={isRoutePlanned}
+          onPlanRoute={() => setIsRoutePlanned(true)}
           onCancel={() => {
             setSelectedScooter(null);
+            setIsRoutePlanned(false); // Desfaz o planejamento se cancelar
           }}
         />
       )}
 
-      <DrawerMenu
-        visible={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-        }}
-      />
+      <DrawerMenu visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </View>
   );
 }
