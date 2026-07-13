@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import { useState, useEffect } from "react";
-import { useLocalSearchParams } from "expo-router";
+// 1. Adicione o router aqui na importação:
+import { useLocalSearchParams, router } from "expo-router";
 
 import Header from "@/components/Header";
 import Map from "@/components/Map";
@@ -41,8 +42,12 @@ export default function HomeScreen() {
       {rideActive ? (
         <RidePanel
           onFinish={() => {
+            // Desativa a interface da corrida e tira a seleção
             setRideActive(false);
             setSelectedScooter(null);
+            
+            // 2. Limpa o parâmetro "startRide" da rota para não entrar no loop!
+            router.setParams({ startRide: "" });
           }}
         />
       ) : (
