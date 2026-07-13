@@ -1,3 +1,4 @@
+export const leafletHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,6 +99,7 @@ let destinationPin = null;
 // e a rota de corrida ativa (verde). Ambas usam o MESMO caminho em zigue-zague.
 const mockRouteCoords = [
     userLocation,
+    [-9.394, -40.500],
     [-9.392889, -40.496006],
     [-9.394727, -40.496358],
     [-9.394767, -40.496519],
@@ -127,7 +129,7 @@ L.polygon(forbiddenZonePoints, {
 L.marker(userLocation, {
     icon: L.divIcon({
         className: 'user-location-marker',
-        html: `<div class="user-pulse"></div><div class="user-dot"></div>`,
+        html: \`<div class="user-pulse"></div><div class="user-dot"></div>\`,
         iconSize: [48, 48],
         iconAnchor: [24, 24]
     }),
@@ -158,7 +160,7 @@ window.togglePlannedRoute = function(isActive) {
             }).addTo(map);
 
             destinationPin = L.marker(destinationCoords, {
-                icon: L.divIcon({ className: 'destination-marker', html: '', iconSize: [30, 30], iconAnchor: [15, 30] })
+                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
             }).addTo(map);
 
             map.flyToBounds(plannedRouteLine.getBounds(), { padding: [80, 80], animate: true, duration: 1.2 });
@@ -197,7 +199,7 @@ window.toggleRideRoute = function(isActive) {
 
             // Adiciona o pino de destino novamente (para visualização durante a corrida)
             destinationPin = L.marker(mockRouteCoords[mockRouteCoords.length - 1], {
-                icon: L.divIcon({ className: 'destination-marker', html: '', iconSize: [30, 30], iconAnchor: [15, 30] })
+                icon: L.divIcon({ className: 'destination-marker', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
             }).addTo(map);
 
             // Dá um zoom mais próximo no usuário (estilo navegação curva a curva)
@@ -248,13 +250,13 @@ function createScooterIcon(selected, battery, scooter) {
     const isInUse = scooter && (scooter.status === "in_use" || scooter.location === "Em utilização");
     return L.divIcon({
         className: "custom-marker",
-        html: `
-        <div class="scooter-container ${selected ? 'selected' : ''} ${isInUse ? 'in-use' : ''}">
-            <div class="scooter-battery">🔋 ${battery}%</div>
+        html: \`
+        <div class="scooter-container \${selected ? 'selected' : ''} \${isInUse ? 'in-use' : ''}">
+            <div class="scooter-battery">🔋 \${battery}%</div>
             <div class="scooter-icon-circle">
                 <span>⚡</span>
             </div>
-        </div>`,
+        </div>\`,
         iconSize:[50, 70],
         iconAnchor:[25, 70]
     });
@@ -284,16 +286,16 @@ function createScooterMarker(scooter){
 function createStationIcon(station, isExpanded){
     return L.divIcon({
         className:"",
-        html:`
+        html:\`
         <div class="station-container">
-            <div class="station-pill ${isExpanded ? 'expanded' : ''}">
+            <div class="station-pill \${isExpanded ? 'expanded' : ''}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <path d="M11.236 1.077c-.503-.311-1.139-.234-1.564.19A1.5 1.5 0 0 0 9.155 2.1l-4.5 12a1.5 1.5 0 0 0 1.93 1.93l3.415-1.28v8.25a1.5 1.5 0 0 0 2.825.707l6-13.5a1.5 1.5 0 0 0-1.785-2.073l-3.805 1.087V2.5a1.5 1.5 0 0 0-1.999-1.423z"/>
                 </svg>
-                ${station.availableScooters}
+                \${station.availableScooters}
             </div>
-            <div class="station-label">${station.name}</div>
-        </div>`,
+            <div class="station-label">\${station.name}</div>
+        </div>\`,
         iconSize:[120,70],
         iconAnchor:[60,35]
     });
@@ -369,3 +371,4 @@ window.updateSelectedScooter = function(id){
 </script>
 </body>
 </html>
+`;

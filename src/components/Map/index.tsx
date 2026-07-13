@@ -7,12 +7,15 @@ import { stations } from "@/data/stations";
 import styles from "./styles";
 import type { Scooter } from "@/types";
 
+// IMPORTANTE: Importamos o HTML em forma de código
+import { leafletHtml } from "./leafletHtml";
+
 type Props = {
   onSelectScooter?: (scooter: Scooter) => void;
   selectedScooter?: Scooter | null;
   centerTrigger?: number; 
   isRoutePlanned?: boolean;
-  rideActive?: boolean; // <-- 1. RECUPERAMOS A VARIÁVEL AQUI
+  rideActive?: boolean;
 };
 
 export default function Map({
@@ -20,7 +23,7 @@ export default function Map({
   selectedScooter,
   centerTrigger = 0,
   isRoutePlanned = false,
-  rideActive = false, // <-- 2. ADICIONAMOS AQUI
+  rideActive = false,
 }: Props) {
   const webViewRef = useRef<WebView>(null);
   const selectedId = selectedScooter?.id ?? null;
@@ -47,7 +50,6 @@ export default function Map({
     }
   }, [centerTrigger]);
 
-  // Dispara a linha azul de planejamento
   useEffect(() => {
     if (webViewRef.current && isRoutePlanned !== undefined) {
       webViewRef.current.injectJavaScript(`
@@ -59,7 +61,6 @@ export default function Map({
     }
   }, [isRoutePlanned]);
 
-  // <-- 3. NOVO: Dispara a linha VERDE de corrida ativa -->
   useEffect(() => {
     if (webViewRef.current && rideActive !== undefined) {
       webViewRef.current.injectJavaScript(`
@@ -78,7 +79,8 @@ export default function Map({
         style={styles.map}
         originWhitelist={["*"]}
         javaScriptEnabled={true}
-        source={require("./leaflet.html")}
+        // AQUI ESTÁ A MÁGICA: Injetando o HTML diretamente da variável
+        source={{ html: leafletHtml }}
         injectedJavaScript={`
           window.stations = ${JSON.stringify(stations)};
           window.allScooters = ${JSON.stringify(scooters)};
@@ -93,7 +95,6 @@ export default function Map({
             window.togglePlannedRoute(${isRoutePlanned});
           }
 
-          // Garante que o mapa desenhe a rota verde se a tela recarregar na corrida
           if (typeof window.toggleRideRoute === 'function') {
             window.toggleRideRoute(${rideActive});
           }

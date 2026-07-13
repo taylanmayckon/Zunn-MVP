@@ -3,6 +3,9 @@
     "name": "Zunn-MVP",
     "slug": "Zunn-MVP",
     "version": "1.0.0",
+    "assetBundlePatterns": [
+      "assets/**/*"
+    ],
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "zunnmvp",
