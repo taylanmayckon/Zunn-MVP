@@ -31,7 +31,7 @@ export default function HomeScreen() {
 
   // Cálculo dinâmico para o botão Flutuante (FAB) não ficar escondido
   const getFabBottomPosition = () => {
-    if (rideActive) return 260; 
+    if (rideActive) return 360; 
     if (selectedScooter) return 380; // Acima do bottomsheet expandido
     return 240; // Acima do bottomsheet minimizado
   };
@@ -42,6 +42,7 @@ export default function HomeScreen() {
         onSelectScooter={setSelectedScooter}
         selectedScooter={selectedScooter}
         centerTrigger={centerMapTrigger}
+        rideActive={rideActive}
       />
 
       {!drawerOpen && (

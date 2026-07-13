@@ -10,14 +10,15 @@ import type { Scooter } from "@/types";
 type Props = {
   onSelectScooter?: (scooter: Scooter) => void;
   selectedScooter?: Scooter | null;
-  // Nova propriedade para engatilhar o foco no usuário
   centerTrigger?: number; 
+  rideActive?: boolean;
 };
 
 export default function Map({
   onSelectScooter,
   selectedScooter,
   centerTrigger = 0,
+  rideActive = false,
 }: Props) {
   const webViewRef = useRef<WebView>(null);
   const selectedId = selectedScooter?.id ?? null;
@@ -33,7 +34,6 @@ export default function Map({
     }
   }, [selectedId]);
 
-  // Novo useEffect escutando o botão de localização da Home
   useEffect(() => {
     if (centerTrigger > 0 && webViewRef.current) {
       webViewRef.current.injectJavaScript(`
@@ -44,6 +44,18 @@ export default function Map({
       `);
     }
   }, [centerTrigger]);
+
+  // Mantemos o useEffect para atualizações de estado quando o componente já está vivo
+  useEffect(() => {
+    if (webViewRef.current && rideActive !== undefined) {
+      webViewRef.current.injectJavaScript(`
+        if (typeof window.toggleRideRoute === 'function') {
+          window.toggleRideRoute(${rideActive});
+        }
+        true;
+      `);
+    }
+  }, [rideActive]);
 
   return (
     <View style={styles.container}>
@@ -62,6 +74,12 @@ export default function Map({
           window.selectedScooter = ${JSON.stringify(selectedId)};
           window.renderStations();
           window.renderMovingScooters();
+          
+          /* CORREÇÃO AQUI: Força o mapa a verificar se deve desenhar a rota assim que nascer */
+          if (typeof window.toggleRideRoute === 'function') {
+            window.toggleRideRoute(${rideActive});
+          }
+          
           true;
         `}
         onMessage={(event) => {
