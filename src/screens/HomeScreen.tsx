@@ -10,126 +10,56 @@ import RidePanel from "@/components/RidePanel";
 
 import type { Scooter } from "@/types";
 
-
 export default function HomeScreen() {
-
-
   const params = useLocalSearchParams();
 
+  const [selectedScooter, setSelectedScooter] = useState<Scooter | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [rideActive, setRideActive] = useState(false);
 
-  const [selectedScooter, setSelectedScooter] =
-    useState<Scooter | null>(null);
-
-
-  const [drawerOpen,setDrawerOpen] =
-    useState(false);
-
-
-  const [rideActive,setRideActive] =
-    useState(false);
-
-
-
-  useEffect(()=>{
-
-    if(params.startRide === "true"){
-
+  useEffect(() => {
+    if (params.startRide === "true") {
       setRideActive(true);
-
     }
-
-  },[params]);
-
-
+  }, [params]);
 
   return (
-
-    <View style={{flex:1}}>
-
-
+    <View style={{ flex: 1 }}>
       <Map
-
         onSelectScooter={setSelectedScooter}
-
         selectedScooter={selectedScooter}
-
       />
-
-
 
       {!drawerOpen && (
-
         <Header
-
-          onMenuPress={()=>{
-
+          onMenuPress={() => {
             setDrawerOpen(true);
-
           }}
-
         />
-
       )}
 
-
-
-
-      {
-        rideActive ? (
-
-          <RidePanel
-
-            onFinish={()=>{
-
-              setRideActive(false);
-
-              setSelectedScooter(null);
-
-            }}
-
-          />
-
-        )
-
-        :
-
-        (
-
-          <BottomSheet
-
-            scooter={selectedScooter}
-
-            onCancel={()=>{
-
-              setSelectedScooter(null);
-
-            }}
-
-          />
-
-        )
-
-      }
-
-
-
-
+      {rideActive ? (
+        <RidePanel
+          onFinish={() => {
+            setRideActive(false);
+            setSelectedScooter(null);
+          }}
+        />
+      ) : (
+        <BottomSheet
+          scooter={selectedScooter}
+          onCancel={() => {
+            setSelectedScooter(null);
+          }}
+        />
+      )}
 
       <DrawerMenu
-
         visible={drawerOpen}
-
-        onClose={()=>{
-
+        onClose={() => {
           setDrawerOpen(false);
-
         }}
-
       />
-
-
     </View>
-
   );
-
 }

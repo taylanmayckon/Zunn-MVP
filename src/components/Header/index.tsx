@@ -1,8 +1,9 @@
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, Text } from "react-native";
 import { Menu, Wallet, Zap } from "lucide-react-native";
 import { router } from "expo-router";
-import IconButton from "../IconButton";
 
+import IconButton from "../IconButton";
+import { Colors } from "@/constants";
 import styles from "./styles";
 
 type Props = {
@@ -17,7 +18,8 @@ export default function Header({ onMenuPress }: Props) {
       </IconButton>
 
       <View style={styles.logo}>
-        <Zap color="black" fill="black" />
+        {/* Raio com a cor primária (Verde Neon) para dar destaque */}
+        <Zap color={Colors.primary} fill={Colors.primary} size={18} />
 
         <Text style={styles.title}>
           ZUNN
