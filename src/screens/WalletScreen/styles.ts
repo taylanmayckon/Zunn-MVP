@@ -128,4 +128,19 @@ backButton: {
   marginRight: 14,
 },
 
+paymentCard: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#18181b",
+  padding: 16,
+  borderRadius: 18,
+  borderWidth: 1,
+  borderColor: "#27272a",
+},
+changePaymentText: {
+  color: "#A3E635",
+  fontWeight: "700",
+  fontSize: 14,
+},
+
 });
